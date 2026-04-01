@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f5a623">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DevedorApp">
+<title>DevedorApp</title>
+<link rel="manifest" href="./manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0a0c0f; --surface:#111418; --surface2:#181c22;
+    --border:#1f2530; --border2:#2a3142;
+    --amber:#f5a623; --amber-dim:#b87a18; --amber-glow:rgba(245,166,35,.12);
+    --red:#e05a5a; --red-glow:rgba(224,90,90,.12);
+    --green:#4caf82; --green-glow:rgba(76,175,130,.12);
+    --blue:#5b8def; --blue-glow:rgba(91,141,239,.12);
+    --purple:#9b72ef; --purple-glow:rgba(155,114,239,.12);
+    --text:#e8eaf0; --text-muted:#7a8499; --text-dim:#4a5368;
+    --radius:12px; --radius-sm:8px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(245,166,35,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(245,166,35,.025) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+
+  /* HEADER */
+  header{position:sticky;top:0;z-index:100;background:rgba(10,12,15,.93);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:58px;}
+  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;letter-spacing:-.5px;}
+  .logo span{color:var(--amber);}
+  .header-right{display:flex;align-items:center;gap:8px;}
+  .notif-btn{background:transparent;border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:.8rem;color:var(--text-muted);transition:all .2s;}
+  .notif-btn.on{color:var(--amber);border-color:var(--amber-dim);background:var(--amber-glow);}
+
+  /* MAIN */
+  main{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:20px 14px 90px;}
+
+  /* STATS */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;position:relative;overflow:hidden;}
+  .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+  .stat-card.total::before{background:linear-gradient(90deg,var(--amber),transparent);}
+  .stat-card.pendentes::before{background:linear-gradient(90deg,var(--red),transparent);}
+  .stat-card.recebido::before{background:linear-gradient(90deg,var(--green),transparent);}
+  .stat-label{font-size:.68rem;color:var(--text-muted);font-weight:500;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;}
+  .stat-value{font-family:'Syne',sans-serif;font-size:1.35rem;font-weight:700;}
+  .stat-card.total .stat-value{color:var(--amber);}
+  .stat-card.pendentes .stat-value{color:var(--red);}
+  .stat-card.recebido .stat-value{color:var(--green);}
+  .stat-sub{font-size:.68rem;color:var(--text-dim);margin-top:3px;}
+
+  /* TABS */
+  .tabs{display:flex;gap:3px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:4px;margin-bottom:20px;}
+  .tab{flex:1;padding:8px 4px;background:transparent;border:none;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:500;border-radius:var(--radius-sm);cursor:pointer;transition:all .2s;white-space:nowrap;}
+  .tab.active{background:var(--surface2);color:var(--amber);box-shadow:0 0 0 1px var(--border2);}
+
+  /* PANELS */
+  .panel{display:none;animation:fadeIn .2s ease;}
+  .panel.active{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+  /* SEARCH */
+  .search-wrap{position:relative;margin-bottom:12px;}
+  .search-wrap input{width:100%;padding:9px 12px 9px 36px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none;transition:border-color .2s;}
+  .search-wrap input:focus{border-color:var(--amber-dim);}
+  .search-wrap::before{content:'🔍';position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:.82rem;}
+
+  /* FILTER CHIPS */
+  .filter-chips{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
+  .chip{padding:4px 11px;border-radius:20px;font-size:.73rem;font-weight:500;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;transition:all .15s;}
+  .chip.active{background:var(--amber-glow);border-color:var(--amber-dim);color:var(--amber);}
+
+  /* DEVEDOR CARD */
+  .devedor-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:9px;transition:border-color .2s,transform .15s;cursor:pointer;position:relative;}
+  .devedor-card:hover{border-color:var(--border2);transform:translateY(-1px);}
+  .devedor-card.pago{opacity:.5;}
+  .continuo-tag{position:absolute;top:10px;right:10px;font-size:.62rem;color:var(--amber);background:var(--amber-glow);border:1px solid var(--amber-dim);border-radius:20px;padding:2px 7px;font-weight:500;}
+  .lembrete-tag{position:absolute;top:10px;right:10px;font-size:.62rem;color:var(--purple);background:var(--purple-glow);border:1px solid rgba(155,114,239,.4);border-radius:20px;padding:2px 7px;font-weight:500;}
+  .devedor-card.continuo .lembrete-tag{top:30px;}
+  .card-row{display:flex;align-items:center;justify-content:space-between;padding-right:80px;}
+  .devedor-nome{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;}
+  .devedor-valor{font-family:'DM Mono',monospace;font-weight:500;font-size:.95rem;color:var(--red);}
+  .devedor-card.pago .devedor-valor{color:var(--green);}
+  .devedor-desc{font-size:.75rem;color:var(--text-muted);margin-top:3px;}
+  .devedor-meta{display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap;}
+  .badge{font-size:.65rem;padding:2px 7px;border-radius:20px;font-weight:500;}
+  .badge-pago{background:var(--green-glow);color:var(--green);border:1px solid rgba(76,175,130,.3);}
+  .badge-pendente{background:var(--red-glow);color:var(--red);border:1px solid rgba(224,90,90,.3);}
+  .badge-parcial{background:var(--blue-glow);color:var(--blue);border:1px solid rgba(91,141,239,.3);}
+  .devedor-data{font-size:.7rem;color:var(--text-dim);font-family:'DM Mono',monospace;}
+  .card-body{display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px;}
+  .card-actions{display:flex;gap:5px;flex-wrap:wrap;}
+  .btn-sm{padding:6px 10px;border-radius:6px;font-size:.72rem;font-weight:500;border:1px solid var(--border2);background:transparent;color:var(--text-muted);cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+  .btn-sm:hover{color:var(--text);border-color:var(--amber-dim);}
+  .btn-sm.danger:hover{color:var(--red);border-color:var(--red);}
+  .btn-sm.success{color:var(--green);border-color:rgba(76,175,130,.4);background:var(--green-glow);}
+  .btn-sm.purple{color:var(--purple);border-color:rgba(155,114,239,.4);background:var(--purple-glow);}
+
+  /* LEMBRETE INLINE */
+  .lembrete-form{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-top:10px;}
+  .lembrete-form-title{font-size:.75rem;color:var(--purple);font-weight:600;margin-bottom:8px;}
+  .lembrete-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .lembrete-sel{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;}
+  .freq-btn{padding:4px 10px;border-radius:20px;font-size:.72rem;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;}
+  .freq-btn.active{background:var(--purple-glow);border-color:rgba(155,114,239,.5);color:var(--purple);}
+
+  /* EMPTY */
+  .empty{text-align:center;padding:40px 20px;color:var(--text-dim);}
+  .empty-icon{font-size:2.2rem;margin-bottom:10px;}
+  .empty p{font-size:.82rem;}
+
+  /* OVERLAY/MODAL */
+  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(4px);z-index:200;align-items:flex-end;justify-content:center;padding:0;}
+  .overlay.open{display:flex;animation:fadeIn .2s ease;}
+  .modal{background:var(--surface);border:1px solid var(--border2);border-radius:16px 16px 0 0;padding:24px 20px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;}
+  @media(min-width:600px){.overlay{align-items:center;padding:16px;}.modal{border-radius:16px;}}
+  .modal-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:18px;}
+  .modal-title span{color:var(--amber);}
+  .modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 18px;}
+
+  /* FORM */
+  .form-group{margin-bottom:13px;}
+  label{font-size:.72rem;color:var(--text-muted);font-weight:500;display:block;margin-bottom:5px;letter-spacing:.3px;}
+  input[type=text],input[type=number],input[type=date],input[type=time],textarea,select{width:100%;padding:9px 11px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none;transition:border-color .2s;}
+  input:focus,textarea:focus,select:focus{border-color:var(--amber-dim);}
+  textarea{resize:vertical;min-height:70px;}
+  select option{background:var(--surface);}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);}
+  .toggle-label{font-size:.83rem;color:var(--text);}
+  .toggle-sub{font-size:.7rem;color:var(--text-muted);margin-top:1px;}
+  .toggle{position:relative;width:38px;height:21px;}
+  .toggle input{opacity:0;width:0;height:0;}
+  .toggle-slider{position:absolute;inset:0;background:var(--border2);border-radius:20px;cursor:pointer;transition:.2s;}
+  .toggle-slider::before{content:'';position:absolute;width:15px;height:15px;left:3px;top:3px;background:var(--text-muted);border-radius:50%;transition:.2s;}
+  .toggle input:checked+.toggle-slider{background:var(--amber-dim);}
+  .toggle input:checked+.toggle-slider::before{transform:translateX(17px);background:var(--amber);}
+
+  /* BUTTONS */
+  .btn{padding:10px 18px;border-radius:var(--radius-sm);font-size:.83rem;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .15s;border:none;display:inline-flex;align-items:center;gap:5px;}
+  .btn-primary{background:var(--amber);color:#000;}
+  .btn-primary:hover{background:#f5b840;}
+  .btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text-muted);}
+  .btn-ghost:hover{color:var(--text);border-color:var(--amber-dim);}
+  .btn-danger{background:var(--red-glow);border:1px solid rgba(224,90,90,.4);color:var(--red);}
+  .btn-purple{background:var(--purple-glow);border:1px solid rgba(155,114,239,.4);color:var(--purple);}
+  .modal-footer{display:flex;gap:7px;justify-content:flex-end;margin-top:18px;}
+
+  /* FAB */
+  .fab{position:fixed;bottom:22px;right:18px;z-index:150;width:52px;height:52px;border-radius:50%;background:var(--amber);color:#000;border:none;font-size:1.5rem;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(245,166,35,.4);display:flex;align-items:center;justify-content:center;}
+  .fab:hover{transform:scale(1.08);}
+
+  /* COBRANÇA */
+  .msg-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px;font-size:.8rem;line-height:1.6;white-space:pre-wrap;font-family:'DM Mono',monospace;color:var(--text);margin-top:10px;position:relative;}
+  .copy-btn{position:absolute;top:7px;right:7px;padding:3px 9px;border-radius:4px;font-size:.68rem;background:var(--surface2);border:1px solid var(--border2);color:var(--text-muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;}
+  .copy-btn:hover{color:var(--amber);}
+
+  /* CONFIG */
+  .config-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:14px;}
+  .config-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;margin-bottom:12px;color:var(--amber);}
+
+  /* HIST */
+  .hist-item{display:flex;align-items:center;gap:10px;padding:9px 13px;border-bottom:1px solid var(--border);font-size:.8rem;}
+  .hist-item:last-child{border-bottom:none;}
+  .hist-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+  .hist-dot.add{background:var(--red);}
+  .hist-dot.pay{background:var(--green);}
+  .hist-dot.msg{background:var(--blue);}
+  .hist-dot.alarm{background:var(--purple);}
+  .hist-info{flex:1;}
+  .hist-nome{font-weight:500;}
+  .hist-time{color:var(--text-dim);font-family:'DM Mono',monospace;font-size:.68rem;white-space:nowrap;}
+
+  /* LEMBRETES PANEL */
+  .lembrete-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:9px;display:flex;align-items:center;gap:12px;}
+  .lembrete-icon{font-size:1.4rem;flex-shrink:0;}
+  .lembrete-info{flex:1;}
+  .lembrete-nome{font-family:'Syne',sans-serif;font-weight:700;font-size:.92rem;}
+  .lembrete-quando{font-size:.75rem;color:var(--purple);font-family:'DM Mono',monospace;margin-top:2px;}
+  .lembrete-freq{font-size:.68rem;color:var(--text-muted);margin-top:2px;}
+  .lembrete-actions{display:flex;gap:5px;}
+
+  /* NOTIF BANNER */
+  .notif-banner{background:var(--purple-glow);border:1px solid rgba(155,114,239,.4);border-radius:var(--radius);padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;font-size:.8rem;cursor:pointer;}
+  .notif-banner.hidden{display:none;}
+
+  /* TOTALS BAR */
+  .totals-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;font-size:.78rem;}
+  .totals-bar span{color:var(--text-muted);}
+  .totals-bar strong{color:var(--amber);font-family:'DM Mono',monospace;}
+
+  /* WPP BTN */
+  .btn-wpp{background:#25D366;color:#fff;border:none;padding:9px 16px;border-radius:var(--radius-sm);font-size:.82rem;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .15s;}
+  .btn-wpp:hover{background:#22c05e;}
+
+  @media(max-width:480px){.stats{grid-template-columns:1fr 1fr;}.stats .stat-card:last-child{grid-column:span 2;}.form-row{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Devedor<span>App</span></div>
+  <div class="header-right">
+    <button class="notif-btn" id="notif-btn" onclick="pedirPermissaoNotif()">🔔 Notif</button>
+    <button class="btn btn-ghost" style="font-size:.78rem;padding:6px 11px" onclick="openModal('modal-add')">＋ Novo</button>
+  </div>
+</header>
+
+<main>
+  <!-- BANNER NOTIFICAÇÃO -->
+  <div class="notif-banner hidden" id="notif-banner" onclick="pedirPermissaoNotif()">
+    <span style="font-size:1.2rem">🔔</span>
+    <div>
+      <div style="font-weight:600;color:var(--purple)">Ativar lembretes de cobrança</div>
+      <div style="color:var(--text-muted);font-size:.75rem">Toque aqui para receber notificações no celular</div>
+    </div>
+    <span style="color:var(--purple);margin-left:auto">→</span>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card total"><div class="stat-label">Total em Aberto</div><div class="stat-value" id="stat-total">R$ 0</div><div class="stat-sub" id="stat-count">0 devedores</div></div>
+    <div class="stat-card pendentes"><div class="stat-label">Pendentes</div><div class="stat-value" id="stat-pendentes">0</div><div class="stat-sub" id="stat-cont">0 contínuos</div></div>
+    <div class="stat-card recebido"><div class="stat-label">Já Recebido</div><div class="stat-value" id="stat-recebido">R$ 0</div><div class="stat-sub" id="stat-pagos">0 pagos</div></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('devedores',this)">💰 Devedores</button>
+    <button class="tab" onclick="switchTab('lembretes',this)">🔔 Lembretes</button>
+    <button class="tab" onclick="switchTab('cobranca',this)">📨 Cobrança</button>
+    <button class="tab" onclick="switchTab('historico',this)">📋 Histórico</button>
+    <button class="tab" onclick="switchTab('config',this)">⚙️</button>
+  </div>
+
+  <!-- DEVEDORES -->
+  <div class="panel active" id="panel-devedores">
+    <div class="search-wrap"><input type="text" id="search" placeholder="Buscar por nome..." oninput="renderDevedores()"></div>
+    <div class="filter-chips">
+      <button class="chip active" onclick="setFilter('todos',this)">Todos</button>
+      <button class="chip" onclick="setFilter('pendente',this)">Pendentes</button>
+      <button class="chip" onclick="setFilter('continuo',this)">↺ Contínuos</button>
+      <button class="chip" onclick="setFilter('lembrete',this)">🔔 Com Lembrete</button>
+      <button class="chip" onclick="setFilter('pago',this)">Pagos</button>
+    </div>
+    <div id="list-devedores"></div>
+  </div>
+
+  <!-- LEMBRETES -->
+  <div class="panel" id="panel-lembretes">
+    <div class="config-section" style="margin-bottom:16px">
+      <div class="config-title">🔔 Como funcionam os lembretes</div>
+      <p style="font-size:.78rem;color:var(--text-muted);line-height:1.6">
+        Configure um lembrete por devedor. O app vai mandar uma <strong style="color:var(--text)">notificação no seu celular</strong> na hora marcada dizendo que você precisa cobrar aquela pessoa.<br><br>
+        💡 <strong style="color:var(--amber)">Dica:</strong> Instale o app na tela inicial do celular para receber notificações mesmo com o app fechado.
+      </p>
+    </div>
+    <div id="list-lembretes"></div>
+  </div>
+
+  <!-- COBRANÇA -->
+  <div class="panel" id="panel-cobranca">
+    <div class="config-section">
+      <div class="config-title">📨 Gerar Mensagem</div>
+      <div class="form-group">
+        <label>Selecionar Devedor</label>
+        <select id="sel-devedor-msg" onchange="previewMsg()">
+          <option value="">— escolha um devedor —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tom da Mensagem</label>
+        <select id="sel-tom" onchange="previewMsg()">
+          <option value="gentil">😊 Gentil / Amigável</option>
+          <option value="formal">📋 Formal</option>
+          <option value="firme">⚡ Firme</option>
+          <option value="ultimo">🚨 Último Aviso</option>
+        </select>
+      </div>
+      <div id="msg-preview-wrap" style="display:none">
+        <label>Mensagem Gerada</label>
+        <div class="msg-box"><button class="copy-btn" onclick="copyMsg()">Copiar</button><span id="msg-text"></span></div>
+        <div style="display:flex;gap:7px;margin-top:10px;flex-wrap:wrap">
+          <button class="btn-wpp" onclick="sendWhatsApp()"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>Enviar WhatsApp</button>
+          <button class="btn btn-ghost" onclick="previewMsg()">🔄 Regenerar</button>
+        </div>
+      </div>
+    </div>
+    <div class="config-section">
+      <div class="config-title">↺ Devedores Contínuos</div>
+      <div id="lista-continuos"></div>
+    </div>
+  </div>
+
+  <!-- HISTÓRICO -->
+  <div class="panel" id="panel-historico">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem">Atividade</div>
+      <button class="btn btn-ghost" style="font-size:.72rem;padding:5px 9px" onclick="clearHistorico()">Limpar</button>
+    </div>
+    <div class="config-section" style="padding:0;overflow:hidden"><div id="list-historico"></div></div>
+  </div>
+
+  <!-- CONFIG -->
+  <div class="panel" id="panel-config">
+    <div class="config-section">
+      <div class="config-title">👤 Sua Assinatura</div>
+      <p style="font-size:.78rem;color:var(--text-muted);margin-bottom:12px">Aparece no final de cada mensagem de cobrança.</p>
+      <div class="form-group"><label>Seu Nome / Negócio</label><input type="text" id="cfg-nome" placeholder="Ex: Paulo" oninput="saveConfig()"></div>
+      <div class="form-group"><label>Telefone / WhatsApp</label><input type="text" id="cfg-tel" placeholder="(xx) 9xxxx-xxxx" oninput="saveConfig()"></div>
+      <div class="form-group"><label>Pix / Info extra (opcional)</label><input type="text" id="cfg-extra" placeholder="Pix: 00000-000" oninput="saveConfig()"></div>
+    </div>
+    <div class="config-section">
+      <div class="config-title">🔔 Notificações</div>
+      <div id="notif-status" style="font-size:.82rem;color:var(--text-muted);margin-bottom:10px"></div>
+      <button class="btn btn-purple" onclick="pedirPermissaoNotif()">Ativar / Verificar Notificações</button>
+    </div>
+    <div class="config-section">
+      <div class="config-title">📦 Backup</div>
+      <div style="display:flex;gap:7px;flex-wrap:wrap">
+        <button class="btn btn-ghost" onclick="exportData()">⬇ Exportar</button>
+        <label class="btn btn-ghost" style="cursor:pointer">⬆ Importar<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
+      </div>
+    </div>
+    <div class="config-section">
+      <div class="config-title">🗑️ Dados</div>
+      <button class="btn btn-danger" onclick="limparTudo()">Apagar tudo</button>
+    </div>
+  </div>
+</main>
+
+<button class="fab" onclick="openModal('modal-add')">＋</button>
+
+<!-- MODAL: NOVO DEVEDOR -->
+<div class="overlay" id="modal-add">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Novo <span>Devedor</span></div>
+    <div class="form-group"><label>Nome</label><input type="text" id="f-nome" placeholder="Nome do devedor"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Valor Devido (R$)</label><input type="number" id="f-valor" placeholder="0,00" min="0" step="0.01"></div>
+      <div class="form-group"><label>Data</label><input type="date" id="f-data"></div>
+    </div>
+    <div class="form-group"><label>Descrição</label><textarea id="f-desc" placeholder="fiado, empréstimo, serviço..."></textarea></div>
+    <div class="form-group"><label>Telefone (para WhatsApp)</label><input type="text" id="f-tel" placeholder="(xx) 9xxxx-xxxx"></div>
+    <div class="toggle-row" style="margin-bottom:10px">
+      <div><div class="toggle-label">↺ Devedor Contínuo</div><div class="toggle-sub">Deve com frequência</div></div>
+      <label class="toggle"><input type="checkbox" id="f-continuo"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="toggle-row">
+      <div><div class="toggle-label">🔔 Criar Lembrete Agora</div><div class="toggle-sub">Notificação para cobrar</div></div>
+      <label class="toggle"><input type="checkbox" id="f-add-lembrete" onchange="toggleLembreteForm('f-lembrete-form')"><span class="toggle-slider"></span></label>
+    </div>
+    <div id="f-lembrete-form" style="display:none;margin-top:10px">
+      <div class="lembrete-form">
+        <div class="lembrete-form-title">🔔 Configurar Lembrete</div>
+        <div class="form-row">
+          <div class="form-group"><label>Data do Lembrete</label><input type="date" id="f-l-data"></div>
+          <div class="form-group"><label>Horário</label><input type="time" id="f-l-hora" value="09:00"></div>
+        </div>
+        <div class="form-group">
+          <label>Repetir</label>
+          <div class="lembrete-sel">
+            <button type="button" class="freq-btn active" data-freq="nao" onclick="selFreq(this,'f')">Não repetir</button>
+            <button type="button" class="freq-btn" data-freq="semanal" onclick="selFreq(this,'f')">Semanal</button>
+            <button type="button" class="freq-btn" data-freq="mensal" onclick="selFreq(this,'f')">Mensal</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add')">Cancelar</button>
+      <button class="btn btn-primary" onclick="addDevedor()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: PAGAMENTO -->
+<div class="overlay" id="modal-pag">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">💵 Registrar <span>Pagamento</span></div>
+    <input type="hidden" id="pag-id">
+    <div id="pag-info" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:11px;margin-bottom:14px;font-size:.83rem"></div>
+    <div class="form-group"><label>Tipo</label>
+      <select id="pag-tipo" onchange="togglePagTipo()">
+        <option value="total">✅ Pagamento Total</option>
+        <option value="parcial">💧 Pagamento Parcial</option>
+      </select>
+    </div>
+    <div class="form-group" id="pag-parcial-wrap" style="display:none"><label>Valor Pago (R$)</label><input type="number" id="pag-valor" placeholder="0,00" min="0" step="0.01"></div>
+    <div class="form-group"><label>Observação</label><input type="text" id="pag-obs" placeholder="Pix, dinheiro, parcial..."></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-pag')">Cancelar</button>
+      <button class="btn btn-primary" onclick="registrarPagamento()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: EDITAR -->
+<div class="overlay" id="modal-edit">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Editar <span>Devedor</span></div>
+    <input type="hidden" id="e-id">
+    <div class="form-group"><label>Nome</label><input type="text" id="e-nome"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Valor (R$)</label><input type="number" id="e-valor" min="0" step="0.01"></div>
+      <div class="form-group"><label>Data</label><input type="date" id="e-data"></div>
+    </div>
+    <div class="form-group"><label>Descrição</label><textarea id="e-desc"></textarea></div>
+    <div class="form-group"><label>Telefone</label><input type="text" id="e-tel"></div>
+    <div class="toggle-row">
+      <div><div class="toggle-label">↺ Devedor Contínuo</div></div>
+      <label class="toggle"><input type="checkbox" id="e-continuo"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-edit')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarEdicao()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: LEMBRETE -->
+<div class="overlay" id="modal-lembrete">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🔔 Configurar <span>Lembrete</span></div>
+    <input type="hidden" id="l-devedor-id">
+    <div id="l-devedor-nome" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:14px;font-size:.85rem;font-weight:600"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Data</label><input type="date" id="l-data"></div>
+      <div class="form-group"><label>Horário</label><input type="time" id="l-hora" value="09:00"></div>
+    </div>
+    <div class="form-group">
+      <label>Repetir</label>
+      <div class="lembrete-sel">
+        <button type="button" class="freq-btn active" data-freq="nao" onclick="selFreq(this,'l')">Não repetir</button>
+        <button type="button" class="freq-btn" data-freq="semanal" onclick="selFreq(this,'l')">Toda semana</button>
+        <button type="button" class="freq-btn" data-freq="mensal" onclick="selFreq(this,'l')">Todo mês</button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-lembrete')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarLembrete()">Salvar Lembrete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════
+// DATA
+// ════════════════════════════════
+let devedores = JSON.parse(localStorage.getItem('dapp_devedores') || '[]');
+let historico  = JSON.parse(localStorage.getItem('dapp_hist') || '[]');
+let lembretes  = JSON.parse(localStorage.getItem('dapp_lembretes') || '[]');
+let config     = JSON.parse(localStorage.getItem('dapp_config') || '{}');
+let filtroAtivo = 'todos';
+let freqSel = { f: 'nao', l: 'nao' };
+
+function save() {
+  localStorage.setItem('dapp_devedores', JSON.stringify(devedores));
+  localStorage.setItem('dapp_hist',      JSON.stringify(historico));
+  localStorage.setItem('dapp_lembretes', JSON.stringify(lembretes));
+  localStorage.setItem('dapp_config',    JSON.stringify(config));
+}
+
+function fmtR$(n) {
+  return 'R$\u00a0' + Number(n).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+function fmtData(d) {
+  if (!d) return '';
+  const [y, m, dd] = d.split('-');
+  return `${dd}/${m}/${y}`;
+}
+function dataHoje() { return new Date().toISOString().split('T')[0]; }
+
+// ════════════════════════════════
+// SERVICE WORKER
+// ════════════════════════════════
+async function registrarSW() {
+  if (!('serviceWorker' in navigator)) return;
+  try {
+    const reg = await navigator.serviceWorker.register('./sw.js');
+    console.log('SW registrado', reg.scope);
+    // Envia lembretes para o SW checar
+    if (reg.active) reg.active.postMessage({ type: 'CHECK_LEMBRETES' });
+  } catch (e) { console.warn('SW falhou:', e); }
+}
+
+// ════════════════════════════════
+// NOTIFICAÇÕES
+// ════════════════════════════════
+async function pedirPermissaoNotif() {
+  if (!('Notification' in window)) {
+    alert('Seu navegador não suporta notificações. Use o Chrome no Android.');
+    return;
+  }
+  const perm = await Notification.requestPermission();
+  atualizarStatusNotif(perm);
+  if (perm === 'granted') {
+    document.getElementById('notif-banner').classList.add('hidden');
+    document.getElementById('notif-btn').classList.add('on');
+    document.getElementById('notif-btn').textContent = '🔔 Ativo';
+    // Notificação de boas vindas
+    new Notification('DevedorApp ativado! ✅', {
+      body: 'Você vai receber lembretes de cobrança aqui.',
+      icon: './icon-192.png'
+    });
+    sincronizarLembretesComSW();
+  }
+}
+
+function atualizarStatusNotif(perm) {
+  const el = document.getElementById('notif-status');
+  if (!el) return;
+  if (!('Notification' in window)) { el.textContent = '❌ Não suportado neste navegador'; return; }
+  if (perm === 'granted') { el.innerHTML = '<span style="color:var(--green)">✅ Notificações ativas</span>'; }
+  else if (perm === 'denied') { el.innerHTML = '<span style="color:var(--red)">🚫 Notificações bloqueadas — desbloqueie nas configurações do navegador</span>'; }
+  else { el.innerHTML = '<span style="color:var(--amber)">⚠️ Permissão não concedida ainda</span>'; }
+}
+
+async function sincronizarLembretesComSW() {
+  if (!('serviceWorker' in navigator)) return;
+  const reg = await navigator.serviceWorker.getRegistration();
+  if (!reg) return;
+  const agora = Date.now();
+  for (const l of lembretes) {
+    const ts = new Date(`${l.data}T${l.hora}`).getTime();
+    if (ts > agora) {
+      const d = devedores.find(x => x.id === l.devedorId);
+      if (!d) continue;
+      const msg = gerarMsg(d, 'gentil');
+      const tel = d.tel ? d.tel.replace(/\D/g, '') : '';
+      const wppUrl = tel ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}` : '';
+      const payload = {
+        swId: l.id,
+        id: l.id,
+        devedorId: l.devedorId,
+        nome: d.nome,
+        valor: fmtR$(d.valorRestante || d.valor),
+        timestamp: ts,
+        wppUrl,
+        disparado: false
+      };
+      // Salva no IndexedDB via SW message
+      const sw = reg.active || reg.waiting || reg.installing;
+      if (sw) sw.postMessage({ type: 'AGENDAR', lembrete: payload });
+    }
+  }
+}
+
+// Verifica lembretes localmente (backup quando app está aberto)
+function verificarLembretesLocal() {
+  if (Notification.permission !== 'granted') return;
+  const agora = Date.now();
+  for (const l of lembretes) {
+    const ts = new Date(`${l.data}T${l.hora}`).getTime();
+    if (ts <= agora && !l.disparadoLocal) {
+      const d = devedores.find(x => x.id === l.devedorId);
+      if (!d || d.status === 'pago') continue;
+      const msg = gerarMsg(d, 'gentil');
+      const tel = d.tel ? d.tel.replace(/\D/g, '') : '';
+      const wppUrl = tel ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}` : '';
+      const notif = new Notification(`💰 Cobrar ${d.nome}`, {
+        body: `Deve ${fmtR$(d.valorRestante || d.valor)} — toque para abrir o WhatsApp`,
+        icon: './icon-192.png',
+        tag: `local-${l.id}`,
+        data: { wppUrl }
+      });
+      notif.onclick = () => { if (wppUrl) window.open(wppUrl, '_blank'); };
+      l.disparadoLocal = true;
+      addHist('alarm', `Lembrete disparado: cobrar ${d.nome}`);
+      // Reagendar se recorrente
+      if (l.freq === 'semanal') { l.data = proximaData(l.data, 7); l.disparadoLocal = false; }
+      if (l.freq === 'mensal') { l.data = proximaDataMes(l.data); l.disparadoLocal = false; }
+      save();
+    }
+  }
+}
+
+function proximaData(dataStr, dias) {
+  const d = new Date(dataStr + 'T12:00:00');
+  d.setDate(d.getDate() + dias);
+  return d.toISOString().split('T')[0];
+}
+function proximaDataMes(dataStr) {
+  const d = new Date(dataStr + 'T12:00:00');
+  d.setMonth(d.getMonth() + 1);
+  return d.toISOString().split('T')[0];
+}
+
+// ════════════════════════════════
+// STATS
+// ════════════════════════════════
+function updateStats() {
+  const pendentes = devedores.filter(d => d.status !== 'pago');
+  const pagos     = devedores.filter(d => d.status === 'pago');
+  const continuos = devedores.filter(d => d.continuo && d.status !== 'pago');
+  const totalAberto = pendentes.reduce((s, d) => s + Number(d.valorRestante ?? d.valor), 0);
+  const totalRecebido = devedores.reduce((s, d) => {
+    return s + (d.pagamentos || []).reduce((a, p) => a + p.valor, 0);
+  }, 0);
+
+  document.getElementById('stat-total').textContent = fmtR$(totalAberto);
+  document.getElementById('stat-count').textContent = `${pendentes.length} devedor${pendentes.length !== 1 ? 'es' : ''}`;
+  document.getElementById('stat-pendentes').textContent = pendentes.length;
+  document.getElementById('stat-cont').textContent = `${continuos.length} contínuo${continuos.length !== 1 ? 's' : ''}`;
+  document.getElementById('stat-recebido').textContent = fmtR$(totalRecebido);
+  document.getElementById('stat-pagos').textContent = `${pagos.length} pago${pagos.length !== 1 ? 's' : ''}`;
+}
+
+// ════════════════════════════════
+// RENDER DEVEDORES
+// ════════════════════════════════
+function renderDevedores() {
+  const q = document.getElementById('search').value.toLowerCase();
+  let lista = devedores.filter(d => d.nome.toLowerCase().includes(q));
+  if (filtroAtivo === 'pendente') lista = lista.filter(d => d.status !== 'pago');
+  if (filtroAtivo === 'continuo') lista = lista.filter(d => d.continuo && d.status !== 'pago');
+  if (filtroAtivo === 'lembrete') lista = lista.filter(d => lembretes.some(l => l.devedorId === d.id));
+  if (filtroAtivo === 'pago')    lista = lista.filter(d => d.status === 'pago');
+
+  const el = document.getElementById('list-devedores');
+  if (!lista.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">🏦</div><p>Nenhum devedor encontrado.</p></div>`;
+    return;
+  }
+
+  const totalFiltrado = lista.filter(d => d.status !== 'pago').reduce((s, d) => s + Number(d.valorRestante ?? d.valor), 0);
+  const barra = (filtroAtivo !== 'pago' && totalFiltrado > 0) ?
+    `<div class="totals-bar"><span>Total em aberto</span><strong>${fmtR$(totalFiltrado)}</strong></div>` : '';
+
+  el.innerHTML = barra + lista.map(d => {
+    const valor = d.valorRestante !== undefined ? d.valorRestante : d.valor;
+    const pags  = d.pagamentos || [];
+    const temLembrete = lembretes.find(l => l.devedorId === d.id);
+    const badge = d.status === 'pago'
+      ? `<span class="badge badge-pago">✓ Pago</span>`
+      : d.status === 'parcial'
+        ? `<span class="badge badge-parcial">↓ Parcial</span>`
+        : `<span class="badge badge-pendente">● Pendente</span>`;
+    return `
+    <div class="devedor-card ${d.status === 'pago' ? 'pago' : ''} ${d.continuo && d.status !== 'pago' ? 'continuo' : ''}" onclick="toggleCard('cb-${d.id}')">
+      ${d.continuo && d.status !== 'pago' ? `<div class="continuo-tag">↺ contínuo</div>` : ''}
+      ${temLembrete ? `<div class="lembrete-tag">🔔 ${fmtData(temLembrete.data)}</div>` : ''}
+      <div class="card-row">
+        <div class="devedor-nome">${d.nome}</div>
+        <div class="devedor-valor">${d.status === 'pago' ? `<span style="color:var(--green)">${fmtR$(d.valor)}</span>` : fmtR$(valor)}</div>
+      </div>
+      ${d.desc ? `<div class="devedor-desc">${d.desc}</div>` : ''}
+      <div class="devedor-meta">
+        ${badge}
+        ${d.data ? `<span class="devedor-data">${fmtData(d.data)}</span>` : ''}
+        ${pags.length ? `<span class="devedor-data" style="color:var(--blue)">${pags.length} pagto${pags.length > 1 ? 's' : ''}</span>` : ''}
+      </div>
+      <div class="card-body" id="cb-${d.id}">
+        ${d.tel ? `<div style="font-size:.76rem;color:var(--text-muted);margin-bottom:8px">📞 ${d.tel}</div>` : ''}
+        ${pags.length ? `<div style="font-size:.72rem;color:var(--text-dim);margin-bottom:8px;background:var(--bg);padding:7px;border-radius:6px">Pagamentos: ${pags.map(p => `<span style="color:var(--green)">${fmtR$(p.valor)}</span> em ${fmtData(p.data)}`).join(' · ')}</div>` : ''}
+        <div class="card-actions">
+          ${d.status !== 'pago' ? `<button class="btn-sm success" onclick="abrirPagamento('${d.id}',event)">💵 Pagar</button>` : ''}
+          ${d.tel ? `<button class="btn-sm" onclick="cobrarWpp('${d.id}',event)">📱 WhatsApp</button>` : ''}
+          <button class="btn-sm purple" onclick="abrirLembrete('${d.id}',event)">🔔 ${temLembrete ? 'Editar lembrete' : 'Lembrete'}</button>
+          <button class="btn-sm" onclick="abrirEdicao('${d.id}',event)">✏️</button>
+          <button class="btn-sm danger" onclick="deletarDevedor('${d.id}',event)">🗑️</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleCard(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+// ════════════════════════════════
+// ADICIONAR DEVEDOR
+// ════════════════════════════════
+function addDevedor() {
+  const nome  = document.getElementById('f-nome').value.trim();
+  const valor = parseFloat(document.getElementById('f-valor').value);
+  if (!nome || isNaN(valor) || valor <= 0) { alert('Preencha nome e valor!'); return; }
+  const d = {
+    id: Date.now().toString(),
+    nome, valor,
+    valorRestante: valor,
+    data: document.getElementById('f-data').value,
+    desc: document.getElementById('f-desc').value.trim(),
+    tel:  document.getElementById('f-tel').value.trim(),
+    continuo: document.getElementById('f-continuo').checked,
+    status: 'pendente',
+    pagamentos: [],
+    criadoEm: new Date().toISOString()
+  };
+  devedores.unshift(d);
+  addHist('add', `${nome} adicionado — ${fmtR$(valor)}`);
+
+  // Lembrete junto?
+  if (document.getElementById('f-add-lembrete').checked) {
+    const lData = document.getElementById('f-l-data').value;
+    const lHora = document.getElementById('f-l-hora').value;
+    if (lData && lHora) {
+      criarLembrete(d.id, lData, lHora, freqSel.f);
+    }
+  }
+
+  save(); updateStats(); renderDevedores(); populateSelects();
+  closeModal('modal-add'); resetForm();
+}
+
+function resetForm() {
+  ['f-nome','f-valor','f-desc','f-tel'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-data').value = dataHoje();
+  document.getElementById('f-continuo').checked = false;
+  document.getElementById('f-add-lembrete').checked = false;
+  document.getElementById('f-lembrete-form').style.display = 'none';
+  document.querySelectorAll('.freq-btn[data-freq]').forEach(b => b.classList.remove('active'));
+  document.querySelector('.freq-btn[data-freq="nao"]')?.classList.add('active');
+  freqSel.f = 'nao';
+}
+
+// ════════════════════════════════
+// LEMBRETE
+// ════════════════════════════════
+function abrirLembrete(id, e) {
+  if (e) e.stopPropagation();
+  const d = devedores.find(x => x.id === id);
+  if (!d) return;
+  const existente = lembretes.find(l => l.devedorId === id);
+  document.getElementById('l-devedor-id').value = id;
+  document.getElementById('l-devedor-nome').textContent = `🔔 Lembrete para: ${d.nome} (${fmtR$(d.valorRestante ?? d.valor)})`;
+  document.getElementById('l-data').value = existente ? existente.data : proximaData(dataHoje(), 3);
+  document.getElementById('l-hora').value = existente ? existente.hora : '09:00';
+  freqSel.l = existente ? existente.freq : 'nao';
+  document.querySelectorAll('#modal-lembrete .freq-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.freq === freqSel.l);
+  });
+  openModal('modal-lembrete');
+}
+
+function salvarLembrete() {
+  const devedorId = document.getElementById('l-devedor-id').value;
+  const data = document.getElementById('l-data').value;
+  const hora = document.getElementById('l-hora').value;
+  if (!data || !hora) { alert('Escolha data e horário!'); return; }
+  criarLembrete(devedorId, data, hora, freqSel.l);
+  save();
+  renderDevedores();
+  renderLembretes();
+  sincronizarLembretesComSW();
+  closeModal('modal-lembrete');
+  const d = devedores.find(x => x.id === devedorId);
+  if (d) addHist('alarm', `Lembrete criado: cobrar ${d.nome} em ${fmtData(data)}`);
+  save();
+}
+
+function criarLembrete(devedorId, data, hora, freq) {
+  // Remove lembrete existente do mesmo devedor
+  lembretes = lembretes.filter(l => l.devedorId !== devedorId);
+  lembretes.push({
+    id: `l-${Date.now()}`,
+    devedorId, data, hora,
+    freq: freq || 'nao',
+    criadoEm: new Date().toISOString()
+  });
+}
+
+function removerLembrete(id, e) {
+  if (e) e.stopPropagation();
+  lembretes = lembretes.filter(l => l.id !== id);
+  save(); renderLembretes(); renderDevedores();
+}
+
+function renderLembretes() {
+  const el = document.getElementById('list-lembretes');
+  if (!lembretes.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">🔔</div><p>Nenhum lembrete configurado.<br>Toque em um devedor e clique em 🔔 Lembrete.</p></div>`;
+    return;
+  }
+  const sorted = [...lembretes].sort((a, b) => new Date(a.data + 'T' + a.hora) - new Date(b.data + 'T' + b.hora));
+  el.innerHTML = sorted.map(l => {
+    const d = devedores.find(x => x.id === l.devedorId);
+    if (!d) return '';
+    const ts = new Date(l.data + 'T' + l.hora);
+    const passado = ts < new Date();
+    const freqTexto = l.freq === 'semanal' ? '↻ Repete semanalmente' : l.freq === 'mensal' ? '↻ Repete mensalmente' : 'Não repete';
+    return `
+    <div class="lembrete-card" style="${passado ? 'opacity:.5' : ''}">
+      <div class="lembrete-icon">${passado ? '✓' : '🔔'}</div>
+      <div class="lembrete-info">
+        <div class="lembrete-nome">${d.nome}</div>
+        <div class="lembrete-quando">${fmtData(l.data)} às ${l.hora} ${passado ? '— passado' : ''}</div>
+        <div class="lembrete-freq">${freqTexto} · ${fmtR$(d.valorRestante ?? d.valor)}</div>
+      </div>
+      <div class="lembrete-actions">
+        <button class="btn-sm purple" onclick="abrirLembrete('${d.id}',event)">✏️</button>
+        <button class="btn-sm danger" onclick="removerLembrete('${l.id}',event)">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleLembreteForm(id) {
+  const cb = document.getElementById('f-add-lembrete');
+  document.getElementById(id).style.display = cb.checked ? 'block' : 'none';
+  if (cb.checked) {
+    const amanha = proximaData(dataHoje(), 1);
+    document.getElementById('f-l-data').value = amanha;
+  }
+}
+
+function selFreq(btn, ctx) {
+  document.querySelectorAll(`#${ctx === 'f' ? 'f-lembrete-form' : 'modal-lembrete'} .freq-btn`).forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  freqSel[ctx] = btn.dataset.freq;
+}
+
+// ════════════════════════════════
+// EDITAR
+// ════════════════════════════════
+function abrirEdicao(id, e) {
+  if (e) e.stopPropagation();
+  const d = devedores.find(x => x.id === id);
+  if (!d) return;
+  document.getElementById('e-id').value = id;
+  document.getElementById('e-nome').value = d.nome;
+  document.getElementById('e-valor').value = d.valorRestante ?? d.valor;
+  document.getElementById('e-data').value = d.data || '';
+  document.getElementById('e-desc').value = d.desc || '';
+  document.getElementById('e-tel').value  = d.tel || '';
+  document.getElementById('e-continuo').checked = d.continuo || false;
+  openModal('modal-edit');
+}
+
+function salvarEdicao() {
+  const id = document.getElementById('e-id').value;
+  const d  = devedores.find(x => x.id === id);
+  if (!d) return;
+  d.nome = document.getElementById('e-nome').value.trim();
+  const novoValor = parseFloat(document.getElementById('e-valor').value);
+  d.valorRestante = novoValor;
+  if (d.status !== 'pago') d.valor = novoValor;
+  d.data     = document.getElementById('e-data').value;
+  d.desc     = document.getElementById('e-desc').value.trim();
+  d.tel      = document.getElementById('e-tel').value.trim();
+  d.continuo = document.getElementById('e-continuo').checked;
+  save(); updateStats(); renderDevedores(); populateSelects();
+  closeModal('modal-edit');
+}
+
+// ════════════════════════════════
+// DELETAR
+// ════════════════════════════════
+function deletarDevedor(id, e) {
+  if (e) e.stopPropagation();
+  const d = devedores.find(x => x.id === id);
+  if (!d || !confirm(`Remover "${d.nome}"?`)) return;
+  addHist('pay', `${d.nome} removido`);
+  devedores = devedores.filter(x => x.id !== id);
+  lembretes = lembretes.filter(l => l.devedorId !== id);
+  save(); updateStats(); renderDevedores(); renderLembretes(); populateSelects();
+}
+
+// ════════════════════════════════
+// PAGAMENTO
+// ════════════════════════════════
+function abrirPagamento(id, e) {
+  if (e) e.stopPropagation();
+  const d = devedores.find(x => x.id === id);
+  if (!d) return;
+  document.getElementById('pag-id').value = id;
+  const rest = d.valorRestante ?? d.valor;
+  document.getElementById('pag-info').innerHTML = `<strong style="color:var(--amber)">${d.nome}</strong><br>Em aberto: <strong style="color:var(--red)">${fmtR$(rest)}</strong>`;
+  document.getElementById('pag-tipo').value = 'total';
+  document.getElementById('pag-parcial-wrap').style.display = 'none';
+  document.getElementById('pag-obs').value = '';
+  openModal('modal-pag');
+}
+
+function togglePagTipo() {
+  document.getElementById('pag-parcial-wrap').style.display =
+    document.getElementById('pag-tipo').value === 'parcial' ? 'block' : 'none';
+}
+
+function registrarPagamento() {
+  const id = document.getElementById('pag-id').value;
+  const d  = devedores.find(x => x.id === id);
+  if (!d) return;
+  const tipo = document.getElementById('pag-tipo').value;
+  const rest = d.valorRestante ?? d.valor;
+
+  if (tipo === 'total') {
+    d.pagamentos.push({ valor: rest, data: dataHoje(), obs: document.getElementById('pag-obs').value });
+    d.valorRestante = 0;
+    d.status = 'pago';
+    addHist('pay', `${d.nome} — quitou ${fmtR$(rest)}`);
+    // Remove lembrete se pago
+    lembretes = lembretes.filter(l => l.devedorId !== id);
+  } else {
+    const vPago = parseFloat(document.getElementById('pag-valor').value);
+    if (isNaN(vPago) || vPago <= 0) { alert('Informe o valor pago!'); return; }
+    d.pagamentos.push({ valor: vPago, data: dataHoje(), obs: document.getElementById('pag-obs').value });
+    d.valorRestante = Math.max(0, rest - vPago);
+    d.status = d.valorRestante <= 0 ? 'pago' : 'parcial';
+    addHist('pay', `${d.nome} — pagou ${fmtR$(vPago)}, resta ${fmtR$(d.valorRestante)}`);
+  }
+  save(); updateStats(); renderDevedores(); renderLembretes(); closeModal('modal-pag');
+}
+
+// ════════════════════════════════
+// MENSAGEM COBRANÇA
+// ════════════════════════════════
+function getAssinatura() {
+  let s = '';
+  if (config.nome)  s += `\n\nAtenciosamente,\n*${config.nome}*`;
+  if (config.tel)   s += `\n📞 ${config.tel}`;
+  if (config.extra) s += `\n${config.extra}`;
+  return s;
+}
+
+function gerarMsg(d, tom) {
+  const valor = fmtR$(d.valorRestante ?? d.valor);
+  const ass   = getAssinatura();
+  const nome  = d.nome.split(' ')[0];
+  const desc  = d.desc ? ` referente a *${d.desc}*` : '';
+  const pags  = d.pagamentos || [];
+  const histP = pags.length ? `\nJá recebemos *${fmtR$(pags.reduce((s,p) => s+p.valor, 0))}* em pagamentos anteriores.` : '';
+
+  const msgs = {
+    gentil: `Olá, *${nome}*! 😊\n\nPassando pra lembrar que ainda temos um valor em aberto de *${valor}*${desc}.\n\nQuando puder, me avisa para a gente acertar. Estou à disposição!${histP}${ass}`,
+    formal: `Prezado(a) *${nome}*,\n\nInformo que há um saldo pendente de *${valor}*${desc} em seu nome.\n\nSolicito gentilmente que entre em contato para regularização do débito.${histP}${ass}`,
+    firme:  `*${nome}*, boa tarde.\n\nHá um débito de *${valor}*${desc} em aberto que precisa ser quitado.\n\nPor favor, providencie o pagamento o quanto antes.${histP}${ass}`,
+    ultimo: `*${nome}*, notificação urgente.\n\n⚠️ Você possui um débito de *${valor}*${desc} em atraso.\n\nCaso não haja regularização em breve, serei obrigado(a) a tomar as devidas providências.\n\nEntre em contato IMEDIATAMENTE.${histP}${ass}`
+  };
+  return msgs[tom] || msgs.gentil;
+}
+
+function populateSelects() {
+  const sel = document.getElementById('sel-devedor-msg');
+  const pendentes = devedores.filter(d => d.status !== 'pago');
+  sel.innerHTML = '<option value="">— escolha um devedor —</option>' +
+    pendentes.map(d => `<option value="${d.id}">${d.nome} (${fmtR$(d.valorRestante ?? d.valor)})</option>`).join('');
+
+  const cont = document.getElementById('lista-continuos');
+  const continuos = devedores.filter(d => d.continuo && d.status !== 'pago');
+  cont.innerHTML = continuos.length
+    ? continuos.map(d => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)">
+        <div><div style="font-weight:600;font-size:.86rem">${d.nome}</div><div style="font-size:.73rem;color:var(--text-muted)">${fmtR$(d.valorRestante ?? d.valor)}</div></div>
+        <div style="display:flex;gap:5px">
+          <button class="btn-sm" onclick="cobrarWpp('${d.id}',null)">📱</button>
+          <button class="btn-sm purple" onclick="abrirLembrete('${d.id}',null)">🔔</button>
+        </div>
+      </div>`).join('')
+    : '<div style="color:var(--text-dim);font-size:.8rem;padding:8px 0">Nenhum devedor contínuo.</div>';
+}
+
+function previewMsg() {
+  const id  = document.getElementById('sel-devedor-msg').value;
+  const tom = document.getElementById('sel-tom').value;
+  const wrap = document.getElementById('msg-preview-wrap');
+  if (!id) { wrap.style.display = 'none'; return; }
+  const d = devedores.find(x => x.id === id);
+  if (!d) return;
+  document.getElementById('msg-text').textContent = gerarMsg(d, tom);
+  wrap.style.display = 'block';
+}
+
+function copyMsg() {
+  const txt = document.getElementById('msg-text').textContent;
+  navigator.clipboard.writeText(txt).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copiado!';
+    setTimeout(() => btn.textContent = orig, 2000);
+  });
+}
+
+function sendWhatsApp() {
+  const id  = document.getElementById('sel-devedor-msg').value;
+  const msg = document.getElementById('msg-text').textContent;
+  if (!msg) return;
+  const d   = devedores.find(x => x.id === id);
+  const tel = d?.tel ? d.tel.replace(/\D/g,'') : '';
+  const url = tel ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+  addHist('msg', `Cobrança enviada a ${d?.nome || 'devedor'}`);
+  save(); renderHistorico();
+}
+
+function cobrarWpp(id, e) {
+  if (e) e.stopPropagation();
+  const d = devedores.find(x => x.id === id);
+  if (!d) return;
+  const msg = gerarMsg(d, 'gentil');
+  const tel = d.tel ? d.tel.replace(/\D/g,'') : '';
+  const url = tel ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+  addHist('msg', `Cobrança via WhatsApp: ${d.nome}`);
+  save(); renderHistorico();
+}
+
+// ════════════════════════════════
+// HISTÓRICO
+// ════════════════════════════════
+function addHist(tipo, texto) {
+  historico.unshift({ tipo, texto, hora: new Date().toLocaleString('pt-BR') });
+  if (historico.length > 100) historico = historico.slice(0, 100);
+}
+
+function renderHistorico() {
+  const el = document.getElementById('list-historico');
+  if (!historico.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><p>Sem atividade ainda.</p></div>`;
+    return;
+  }
+  el.innerHTML = historico.slice(0, 60).map(h => `
+    <div class="hist-item">
+      <div class="hist-dot ${h.tipo}"></div>
+      <div class="hist-info"><div class="hist-nome">${h.texto}</div></div>
+      <div class="hist-time">${h.hora}</div>
+    </div>`).join('');
+}
+
+function clearHistorico() {
+  if (!confirm('Limpar histórico?')) return;
+  historico = []; save(); renderHistorico();
+}
+
+// ════════════════════════════════
+// CONFIG
+// ════════════════════════════════
+function loadConfig() {
+  document.getElementById('cfg-nome').value  = config.nome  || '';
+  document.getElementById('cfg-tel').value   = config.tel   || '';
+  document.getElementById('cfg-extra').value = config.extra || '';
+}
+function saveConfig() {
+  config.nome  = document.getElementById('cfg-nome').value;
+  config.tel   = document.getElementById('cfg-tel').value;
+  config.extra = document.getElementById('cfg-extra').value;
+  save();
+}
+
+// ════════════════════════════════
+// TABS
+// ════════════════════════════════
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.getElementById('panel-' + name).classList.add('active');
+  if (name === 'cobranca')  { populateSelects(); }
+  if (name === 'historico') { renderHistorico(); }
+  if (name === 'lembretes') { renderLembretes(); }
+  if (name === 'config')    { atualizarStatusNotif(Notification.permission); }
+}
+
+function setFilter(f, el) {
+  filtroAtivo = f;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderDevedores();
+}
+
+// ════════════════════════════════
+// MODAL
+// ════════════════════════════════
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+// ════════════════════════════════
+// DATA IO
+// ════════════════════════════════
+function exportData() {
+  const blob = new Blob([JSON.stringify({ devedores, historico, lembretes, config }, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `devedorapp_${dataHoje()}.json`;
+  a.click();
+}
+
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (data.devedores) devedores = data.devedores;
+      if (data.historico) historico = data.historico;
+      if (data.lembretes) lembretes = data.lembretes;
+      if (data.config)    config    = data.config;
+      save(); init(); alert('Dados importados!');
+    } catch { alert('Arquivo inválido.'); }
+  };
+  r.readAsText(file);
+}
+
+function limparTudo() {
+  if (!confirm('Apagar TODOS os dados?')) return;
+  devedores = []; historico = []; lembretes = []; config = {};
+  save(); init();
+}
+
+// ════════════════════════════════
+// INIT
+// ════════════════════════════════
+function init() {
+  document.getElementById('f-data').value = dataHoje();
+  loadConfig();
+  updateStats();
+  renderDevedores();
+  populateSelects();
+
+  // Banner notificação
+  if ('Notification' in window && Notification.permission !== 'granted') {
+    document.getElementById('notif-banner').classList.remove('hidden');
+  } else if (Notification.permission === 'granted') {
+    document.getElementById('notif-btn').classList.add('on');
+    document.getElementById('notif-btn').textContent = '🔔 Ativo';
+  }
+}
+
+// Checagem periódica quando app está aberto
+setInterval(verificarLembretesLocal, 60_000);
+verificarLembretesLocal();
+
+registrarSW();
+init();
+</script>
+</body>
+</html>
