@@ -7,1139 +7,583 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DevedorApp">
-<title>DevedorApp</title>
 <link rel="manifest" href="./manifest.json">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<title>DevedorApp</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg:#0a0c0f; --surface:#111418; --surface2:#181c22;
-    --border:#1f2530; --border2:#2a3142;
-    --amber:#f5a623; --amber-dim:#b87a18; --amber-glow:rgba(245,166,35,.12);
-    --red:#e05a5a; --red-glow:rgba(224,90,90,.12);
-    --green:#4caf82; --green-glow:rgba(76,175,130,.12);
-    --blue:#5b8def; --blue-glow:rgba(91,141,239,.12);
-    --purple:#9b72ef; --purple-glow:rgba(155,114,239,.12);
-    --text:#e8eaf0; --text-muted:#7a8499; --text-dim:#4a5368;
-    --radius:12px; --radius-sm:8px;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
-  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(245,166,35,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(245,166,35,.025) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+:root{--bg:#0a0c0f;--sf:#111418;--sf2:#181c22;--bd:#1f2530;--bd2:#2a3142;--am:#f5a623;--amd:#b87a18;--amg:rgba(245,166,35,.12);--rd:#e05a5a;--rdg:rgba(224,90,90,.12);--gn:#4caf82;--gng:rgba(76,175,130,.12);--bl:#5b8def;--blg:rgba(91,141,239,.12);--pu:#9b72ef;--pug:rgba(155,114,239,.12);--t1:#e8eaf0;--t2:#7a8499;--t3:#4a5368;--r:12px;--rs:8px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--t1);font-family:"DM Sans",sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(245,166,35,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(245,166,35,.025) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
 
-  /* HEADER */
-  header{position:sticky;top:0;z-index:100;background:rgba(10,12,15,.93);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:58px;}
-  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;letter-spacing:-.5px;}
-  .logo span{color:var(--amber);}
-  .header-right{display:flex;align-items:center;gap:8px;}
-  .notif-btn{background:transparent;border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:.8rem;color:var(--text-muted);transition:all .2s;}
-  .notif-btn.on{color:var(--amber);border-color:var(--amber-dim);background:var(--amber-glow);}
+/* LOGIN */
+.login-screen{position:fixed;inset:0;z-index:500;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;}
+.login-logo{width:88px;height:88px;background:var(--am);border-radius:24px;display:flex;align-items:center;justify-content:center;font-family:"Syne",sans-serif;font-weight:800;font-size:1.8rem;color:#000;margin:0 auto 24px;box-shadow:0 8px 32px rgba(245,166,35,.35);}
+.login-title{font-family:"Syne",sans-serif;font-weight:800;font-size:2rem;margin-bottom:8px;}
+.login-title span{color:var(--am);}
+.login-sub{color:var(--t2);font-size:.9rem;margin-bottom:44px;line-height:1.6;max-width:300px;}
+.btn-google{display:flex;align-items:center;gap:12px;padding:14px 28px;background:#fff;color:#333;border:none;border-radius:12px;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(0,0,0,.3);font-family:"DM Sans",sans-serif;}
+.btn-google:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.4);}
+.login-note{margin-top:20px;font-size:.74rem;color:var(--t3);max-width:280px;line-height:1.6;}
 
-  /* MAIN */
-  main{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:20px 14px 90px;}
+/* HEADER */
+header{position:sticky;top:0;z-index:100;background:rgba(10,12,15,.93);backdrop-filter:blur(16px);border-bottom:1px solid var(--bd);padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:58px;}
+.logo{font-family:"Syne",sans-serif;font-weight:800;font-size:1.15rem;letter-spacing:-.5px;}
+.logo span{color:var(--am);}
+.hright{display:flex;align-items:center;gap:10px;}
+.sync-dot{width:7px;height:7px;border-radius:50%;}
+.sok{background:var(--gn);box-shadow:0 0 6px var(--gn);}
+.sload{background:var(--am);animation:pulse 1s infinite;}
+.serr{background:var(--rd);}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.uarea{display:flex;align-items:center;gap:6px;cursor:pointer;position:relative;}
+.uavatar{width:30px;height:30px;border-radius:50%;border:2px solid var(--amd);object-fit:cover;}
+.upholder{width:30px;height:30px;border-radius:50%;background:var(--amg);border:2px solid var(--amd);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:var(--am);}
+.umenu{position:absolute;top:42px;right:0;background:var(--sf2);border:1px solid var(--bd2);border-radius:var(--r);padding:8px;min-width:210px;box-shadow:0 8px 30px rgba(0,0,0,.5);z-index:200;display:none;}
+.umenu.open{display:block;animation:fi .15s ease;}
+.umname{padding:8px 10px;font-size:.8rem;font-weight:600;border-bottom:1px solid var(--bd);margin-bottom:4px;}
+.umemail{font-size:.7rem;color:var(--t2);font-weight:400;}
+.umitem{padding:9px 10px;border-radius:6px;cursor:pointer;font-size:.82rem;color:var(--t2);transition:.1s;display:flex;align-items:center;gap:8px;}
+.umitem:hover{background:var(--sf);color:var(--t1);}
+.umitem.danger{color:var(--rd);}
 
-  /* STATS */
-  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
-  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;position:relative;overflow:hidden;}
-  .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
-  .stat-card.total::before{background:linear-gradient(90deg,var(--amber),transparent);}
-  .stat-card.pendentes::before{background:linear-gradient(90deg,var(--red),transparent);}
-  .stat-card.recebido::before{background:linear-gradient(90deg,var(--green),transparent);}
-  .stat-label{font-size:.68rem;color:var(--text-muted);font-weight:500;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;}
-  .stat-value{font-family:'Syne',sans-serif;font-size:1.35rem;font-weight:700;}
-  .stat-card.total .stat-value{color:var(--amber);}
-  .stat-card.pendentes .stat-value{color:var(--red);}
-  .stat-card.recebido .stat-value{color:var(--green);}
-  .stat-sub{font-size:.68rem;color:var(--text-dim);margin-top:3px;}
+/* MAIN */
+main{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:20px 14px 90px;}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+.sc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:14px;position:relative;overflow:hidden;}
+.sc::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;}
+.sc.tot::before{background:linear-gradient(90deg,var(--am),transparent);}
+.sc.pen::before{background:linear-gradient(90deg,var(--rd),transparent);}
+.sc.rec::before{background:linear-gradient(90deg,var(--gn),transparent);}
+.slabel{font-size:.68rem;color:var(--t2);font-weight:500;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;}
+.sval{font-family:"Syne",sans-serif;font-size:1.35rem;font-weight:700;}
+.sc.tot .sval{color:var(--am);}.sc.pen .sval{color:var(--rd);}.sc.rec .sval{color:var(--gn);}
+.ssub{font-size:.68rem;color:var(--t3);margin-top:3px;}
 
-  /* TABS */
-  .tabs{display:flex;gap:3px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:4px;margin-bottom:20px;}
-  .tab{flex:1;padding:8px 4px;background:transparent;border:none;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:500;border-radius:var(--radius-sm);cursor:pointer;transition:all .2s;white-space:nowrap;}
-  .tab.active{background:var(--surface2);color:var(--amber);box-shadow:0 0 0 1px var(--border2);}
+/* TABS */
+.tabs{display:flex;gap:3px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:4px;margin-bottom:20px;}
+.tab{flex:1;padding:8px 4px;background:transparent;border:none;color:var(--t2);font-family:"DM Sans",sans-serif;font-size:.75rem;font-weight:500;border-radius:var(--rs);cursor:pointer;transition:all .2s;white-space:nowrap;}
+.tab.active{background:var(--sf2);color:var(--am);box-shadow:0 0 0 1px var(--bd2);}
+.panel{display:none;animation:fi .2s ease;}
+.panel.active{display:block;}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 
-  /* PANELS */
-  .panel{display:none;animation:fadeIn .2s ease;}
-  .panel.active{display:block;}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+/* SEARCH & CHIPS */
+.sw{position:relative;margin-bottom:12px;}
+.sw input{width:100%;padding:9px 12px 9px 36px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--rs);color:var(--t1);font-family:"DM Sans",sans-serif;font-size:.85rem;outline:none;transition:border-color .2s;}
+.sw input:focus{border-color:var(--amd);}
+.sw::before{content:"🔍";position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:.82rem;}
+.fchips{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
+.chip{padding:4px 11px;border-radius:20px;font-size:.73rem;font-weight:500;border:1px solid var(--bd);background:transparent;color:var(--t2);cursor:pointer;transition:all .15s;}
+.chip.active{background:var(--amg);border-color:var(--amd);color:var(--am);}
 
-  /* SEARCH */
-  .search-wrap{position:relative;margin-bottom:12px;}
-  .search-wrap input{width:100%;padding:9px 12px 9px 36px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none;transition:border-color .2s;}
-  .search-wrap input:focus{border-color:var(--amber-dim);}
-  .search-wrap::before{content:'🔍';position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:.82rem;}
+/* DEVEDOR CARD */
+.dc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:14px;margin-bottom:9px;transition:border-color .2s,transform .15s;cursor:pointer;position:relative;}
+.dc:hover{border-color:var(--bd2);transform:translateY(-1px);}
+.dc.pago{opacity:.5;}
+.ctag{position:absolute;top:10px;right:10px;font-size:.62rem;color:var(--am);background:var(--amg);border:1px solid var(--amd);border-radius:20px;padding:2px 7px;font-weight:500;}
+.ltag{position:absolute;top:10px;right:10px;font-size:.62rem;color:var(--pu);background:var(--pug);border:1px solid rgba(155,114,239,.4);border-radius:20px;padding:2px 7px;font-weight:500;}
+.dc.continuo .ltag{top:30px;}
+.crow{display:flex;align-items:center;justify-content:space-between;padding-right:90px;}
+.dnome{font-family:"Syne",sans-serif;font-weight:700;font-size:.95rem;}
+.dval{font-family:"DM Mono",monospace;font-weight:500;font-size:.95rem;color:var(--rd);}
+.dc.pago .dval{color:var(--gn);}
+.ddesc{font-size:.75rem;color:var(--t2);margin-top:3px;}
+.dmeta{display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap;}
+.badge{font-size:.65rem;padding:2px 7px;border-radius:20px;font-weight:500;}
+.bpago{background:var(--gng);color:var(--gn);border:1px solid rgba(76,175,130,.3);}
+.bpend{background:var(--rdg);color:var(--rd);border:1px solid rgba(224,90,90,.3);}
+.bparc{background:var(--blg);color:var(--bl);border:1px solid rgba(91,141,239,.3);}
+.ddata{font-size:.7rem;color:var(--t3);font-family:"DM Mono",monospace;}
+.cbody{display:none;margin-top:12px;border-top:1px solid var(--bd);padding-top:12px;}
+.cacts{display:flex;gap:5px;flex-wrap:wrap;}
+.bsm{padding:6px 10px;border-radius:6px;font-size:.72rem;font-weight:500;border:1px solid var(--bd2);background:transparent;color:var(--t2);cursor:pointer;transition:all .15s;font-family:"DM Sans",sans-serif;white-space:nowrap;}
+.bsm:hover{color:var(--t1);border-color:var(--amd);}
+.bsm.danger:hover{color:var(--rd);border-color:var(--rd);}
+.bsm.ok{color:var(--gn);border-color:rgba(76,175,130,.4);background:var(--gng);}
+.bsm.pu{color:var(--pu);border-color:rgba(155,114,239,.4);background:var(--pug);}
 
-  /* FILTER CHIPS */
-  .filter-chips{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
-  .chip{padding:4px 11px;border-radius:20px;font-size:.73rem;font-weight:500;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;transition:all .15s;}
-  .chip.active{background:var(--amber-glow);border-color:var(--amber-dim);color:var(--amber);}
+/* EMPTY */
+.empty{text-align:center;padding:40px 20px;color:var(--t3);}
+.empty-icon{font-size:2.2rem;margin-bottom:10px;}
+.empty p{font-size:.82rem;}
 
-  /* DEVEDOR CARD */
-  .devedor-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:9px;transition:border-color .2s,transform .15s;cursor:pointer;position:relative;}
-  .devedor-card:hover{border-color:var(--border2);transform:translateY(-1px);}
-  .devedor-card.pago{opacity:.5;}
-  .continuo-tag{position:absolute;top:10px;right:10px;font-size:.62rem;color:var(--amber);background:var(--amber-glow);border:1px solid var(--amber-dim);border-radius:20px;padding:2px 7px;font-weight:500;}
-  .lembrete-tag{position:absolute;top:10px;right:10px;font-size:.62rem;color:var(--purple);background:var(--purple-glow);border:1px solid rgba(155,114,239,.4);border-radius:20px;padding:2px 7px;font-weight:500;}
-  .devedor-card.continuo .lembrete-tag{top:30px;}
-  .card-row{display:flex;align-items:center;justify-content:space-between;padding-right:80px;}
-  .devedor-nome{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;}
-  .devedor-valor{font-family:'DM Mono',monospace;font-weight:500;font-size:.95rem;color:var(--red);}
-  .devedor-card.pago .devedor-valor{color:var(--green);}
-  .devedor-desc{font-size:.75rem;color:var(--text-muted);margin-top:3px;}
-  .devedor-meta{display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap;}
-  .badge{font-size:.65rem;padding:2px 7px;border-radius:20px;font-weight:500;}
-  .badge-pago{background:var(--green-glow);color:var(--green);border:1px solid rgba(76,175,130,.3);}
-  .badge-pendente{background:var(--red-glow);color:var(--red);border:1px solid rgba(224,90,90,.3);}
-  .badge-parcial{background:var(--blue-glow);color:var(--blue);border:1px solid rgba(91,141,239,.3);}
-  .devedor-data{font-size:.7rem;color:var(--text-dim);font-family:'DM Mono',monospace;}
-  .card-body{display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px;}
-  .card-actions{display:flex;gap:5px;flex-wrap:wrap;}
-  .btn-sm{padding:6px 10px;border-radius:6px;font-size:.72rem;font-weight:500;border:1px solid var(--border2);background:transparent;color:var(--text-muted);cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;white-space:nowrap;}
-  .btn-sm:hover{color:var(--text);border-color:var(--amber-dim);}
-  .btn-sm.danger:hover{color:var(--red);border-color:var(--red);}
-  .btn-sm.success{color:var(--green);border-color:rgba(76,175,130,.4);background:var(--green-glow);}
-  .btn-sm.purple{color:var(--purple);border-color:rgba(155,114,239,.4);background:var(--purple-glow);}
-
-  /* LEMBRETE INLINE */
-  .lembrete-form{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-top:10px;}
-  .lembrete-form-title{font-size:.75rem;color:var(--purple);font-weight:600;margin-bottom:8px;}
-  .lembrete-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-  .lembrete-sel{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;}
-  .freq-btn{padding:4px 10px;border-radius:20px;font-size:.72rem;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;}
-  .freq-btn.active{background:var(--purple-glow);border-color:rgba(155,114,239,.5);color:var(--purple);}
-
-  /* EMPTY */
-  .empty{text-align:center;padding:40px 20px;color:var(--text-dim);}
-  .empty-icon{font-size:2.2rem;margin-bottom:10px;}
-  .empty p{font-size:.82rem;}
-
-  /* OVERLAY/MODAL */
-  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(4px);z-index:200;align-items:flex-end;justify-content:center;padding:0;}
-  .overlay.open{display:flex;animation:fadeIn .2s ease;}
-  .modal{background:var(--surface);border:1px solid var(--border2);border-radius:16px 16px 0 0;padding:24px 20px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;}
-  @media(min-width:600px){.overlay{align-items:center;padding:16px;}.modal{border-radius:16px;}}
-  .modal-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:18px;}
-  .modal-title span{color:var(--amber);}
-  .modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 18px;}
-
-  /* FORM */
-  .form-group{margin-bottom:13px;}
-  label{font-size:.72rem;color:var(--text-muted);font-weight:500;display:block;margin-bottom:5px;letter-spacing:.3px;}
-  input[type=text],input[type=number],input[type=date],input[type=time],textarea,select{width:100%;padding:9px 11px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none;transition:border-color .2s;}
-  input:focus,textarea:focus,select:focus{border-color:var(--amber-dim);}
-  textarea{resize:vertical;min-height:70px;}
-  select option{background:var(--surface);}
-  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-  .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);}
-  .toggle-label{font-size:.83rem;color:var(--text);}
-  .toggle-sub{font-size:.7rem;color:var(--text-muted);margin-top:1px;}
-  .toggle{position:relative;width:38px;height:21px;}
-  .toggle input{opacity:0;width:0;height:0;}
-  .toggle-slider{position:absolute;inset:0;background:var(--border2);border-radius:20px;cursor:pointer;transition:.2s;}
-  .toggle-slider::before{content:'';position:absolute;width:15px;height:15px;left:3px;top:3px;background:var(--text-muted);border-radius:50%;transition:.2s;}
-  .toggle input:checked+.toggle-slider{background:var(--amber-dim);}
-  .toggle input:checked+.toggle-slider::before{transform:translateX(17px);background:var(--amber);}
-
-  /* BUTTONS */
-  .btn{padding:10px 18px;border-radius:var(--radius-sm);font-size:.83rem;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .15s;border:none;display:inline-flex;align-items:center;gap:5px;}
-  .btn-primary{background:var(--amber);color:#000;}
-  .btn-primary:hover{background:#f5b840;}
-  .btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text-muted);}
-  .btn-ghost:hover{color:var(--text);border-color:var(--amber-dim);}
-  .btn-danger{background:var(--red-glow);border:1px solid rgba(224,90,90,.4);color:var(--red);}
-  .btn-purple{background:var(--purple-glow);border:1px solid rgba(155,114,239,.4);color:var(--purple);}
-  .modal-footer{display:flex;gap:7px;justify-content:flex-end;margin-top:18px;}
-
-  /* FAB */
-  .fab{position:fixed;bottom:22px;right:18px;z-index:150;width:52px;height:52px;border-radius:50%;background:var(--amber);color:#000;border:none;font-size:1.5rem;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(245,166,35,.4);display:flex;align-items:center;justify-content:center;}
-  .fab:hover{transform:scale(1.08);}
-
-  /* COBRANÇA */
-  .msg-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px;font-size:.8rem;line-height:1.6;white-space:pre-wrap;font-family:'DM Mono',monospace;color:var(--text);margin-top:10px;position:relative;}
-  .copy-btn{position:absolute;top:7px;right:7px;padding:3px 9px;border-radius:4px;font-size:.68rem;background:var(--surface2);border:1px solid var(--border2);color:var(--text-muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;}
-  .copy-btn:hover{color:var(--amber);}
-
-  /* CONFIG */
-  .config-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:14px;}
-  .config-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;margin-bottom:12px;color:var(--amber);}
-
-  /* HIST */
-  .hist-item{display:flex;align-items:center;gap:10px;padding:9px 13px;border-bottom:1px solid var(--border);font-size:.8rem;}
-  .hist-item:last-child{border-bottom:none;}
-  .hist-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-  .hist-dot.add{background:var(--red);}
-  .hist-dot.pay{background:var(--green);}
-  .hist-dot.msg{background:var(--blue);}
-  .hist-dot.alarm{background:var(--purple);}
-  .hist-info{flex:1;}
-  .hist-nome{font-weight:500;}
-  .hist-time{color:var(--text-dim);font-family:'DM Mono',monospace;font-size:.68rem;white-space:nowrap;}
-
-  /* LEMBRETES PANEL */
-  .lembrete-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:9px;display:flex;align-items:center;gap:12px;}
-  .lembrete-icon{font-size:1.4rem;flex-shrink:0;}
-  .lembrete-info{flex:1;}
-  .lembrete-nome{font-family:'Syne',sans-serif;font-weight:700;font-size:.92rem;}
-  .lembrete-quando{font-size:.75rem;color:var(--purple);font-family:'DM Mono',monospace;margin-top:2px;}
-  .lembrete-freq{font-size:.68rem;color:var(--text-muted);margin-top:2px;}
-  .lembrete-actions{display:flex;gap:5px;}
-
-  /* NOTIF BANNER */
-  .notif-banner{background:var(--purple-glow);border:1px solid rgba(155,114,239,.4);border-radius:var(--radius);padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;font-size:.8rem;cursor:pointer;}
-  .notif-banner.hidden{display:none;}
-
-  /* TOTALS BAR */
-  .totals-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;font-size:.78rem;}
-  .totals-bar span{color:var(--text-muted);}
-  .totals-bar strong{color:var(--amber);font-family:'DM Mono',monospace;}
-
-  /* WPP BTN */
-  .btn-wpp{background:#25D366;color:#fff;border:none;padding:9px 16px;border-radius:var(--radius-sm);font-size:.82rem;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .15s;}
-  .btn-wpp:hover{background:#22c05e;}
-
-  @media(max-width:480px){.stats{grid-template-columns:1fr 1fr;}.stats .stat-card:last-child{grid-column:span 2;}.form-row{grid-template-columns:1fr;}}
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(4px);z-index:200;align-items:flex-end;justify-content:center;}
+.overlay.open{display:flex;animation:fi .2s ease;}
+.modal{background:var(--sf);border:1px solid var(--bd2);border-radius:16px 16px 0 0;padding:24px 20px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;}
+@media(min-width:600px){.overlay{align-items:center;padding:16px;}.modal{border-radius:16px;}}
+.mhandle{width:36px;height:4px;background:var(--bd2);border-radius:2px;margin:0 auto 18px;}
+.mtitle{font-family:"Syne",sans-serif;font-weight:700;font-size:1rem;margin-bottom:18px;}
+.mtitle span{color:var(--am);}
+.fg{margin-bottom:13px;}
+label{font-size:.72rem;color:var(--t2);font-weight:500;display:block;margin-bottom:5px;letter-spacing:.3px;}
+input[type=text],input[type=number],input[type=date],input[type=time],textarea,select{width:100%;padding:9px 11px;background:var(--bg);border:1px solid var(--bd);border-radius:var(--rs);color:var(--t1);font-family:"DM Sans",sans-serif;font-size:.85rem;outline:none;transition:border-color .2s;}
+input:focus,textarea:focus,select:focus{border-color:var(--amd);}
+textarea{resize:vertical;min-height:70px;}
+select option{background:var(--sf);}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.trow{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;background:var(--bg);border:1px solid var(--bd);border-radius:var(--rs);margin-bottom:10px;}
+.tlabel{font-size:.83rem;color:var(--t1);}
+.tsub{font-size:.7rem;color:var(--t2);margin-top:1px;}
+.toggle{position:relative;width:38px;height:21px;}
+.toggle input{opacity:0;width:0;height:0;}
+.tslider{position:absolute;inset:0;background:var(--bd2);border-radius:20px;cursor:pointer;transition:.2s;}
+.tslider::before{content:"";position:absolute;width:15px;height:15px;left:3px;top:3px;background:var(--t2);border-radius:50%;transition:.2s;}
+.toggle input:checked+.tslider{background:var(--amd);}
+.toggle input:checked+.tslider::before{transform:translateX(17px);background:var(--am);}
+.btn{padding:10px 18px;border-radius:var(--rs);font-size:.83rem;font-weight:600;font-family:"DM Sans",sans-serif;cursor:pointer;transition:all .15s;border:none;display:inline-flex;align-items:center;gap:5px;}
+.bprim{background:var(--am);color:#000;}.bprim:hover{background:#f5b840;}
+.bghost{background:transparent;border:1px solid var(--bd2);color:var(--t2);}.bghost:hover{color:var(--t1);border-color:var(--amd);}
+.mfooter{display:flex;gap:7px;justify-content:flex-end;margin-top:18px;}
+.fab{position:fixed;bottom:22px;right:18px;z-index:150;width:52px;height:52px;border-radius:50%;background:var(--am);color:#000;border:none;font-size:1.5rem;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(245,166,35,.4);display:flex;align-items:center;justify-content:center;}
+.fab:hover{transform:scale(1.08);}
+.msgbox{background:var(--bg);border:1px solid var(--bd);border-radius:var(--rs);padding:13px;font-size:.8rem;line-height:1.6;white-space:pre-wrap;font-family:"DM Mono",monospace;color:var(--t1);margin-top:10px;position:relative;}
+.cbtn{position:absolute;top:7px;right:7px;padding:3px 9px;border-radius:4px;font-size:.68rem;background:var(--sf2);border:1px solid var(--bd2);color:var(--t2);cursor:pointer;font-family:"DM Sans",sans-serif;}
+.cbtn:hover{color:var(--am);}
+.csec{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:18px;margin-bottom:14px;}
+.ctitle{font-family:"Syne",sans-serif;font-weight:700;font-size:.88rem;margin-bottom:12px;color:var(--am);}
+.hitem{display:flex;align-items:center;gap:10px;padding:9px 13px;border-bottom:1px solid var(--bd);font-size:.8rem;}
+.hitem:last-child{border-bottom:none;}
+.hdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.hdot.add{background:var(--rd);}.hdot.pay{background:var(--gn);}.hdot.msg{background:var(--bl);}.hdot.alarm{background:var(--pu);}
+.hinfo{flex:1;}.hnome{font-weight:500;}
+.htime{color:var(--t3);font-family:"DM Mono",monospace;font-size:.68rem;white-space:nowrap;}
+.lcard{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:14px;margin-bottom:9px;display:flex;align-items:center;gap:12px;}
+.linfo{flex:1;}.lnome{font-family:"Syne",sans-serif;font-weight:700;font-size:.92rem;}
+.lquando{font-size:.75rem;color:var(--pu);font-family:"DM Mono",monospace;margin-top:2px;}
+.lfreq{font-size:.68rem;color:var(--t2);margin-top:2px;}
+.lform{background:var(--bg);border:1px solid var(--bd);border-radius:var(--rs);padding:12px;margin-top:10px;}
+.lfttitle{font-size:.75rem;color:var(--pu);font-weight:600;margin-bottom:8px;}
+.fqbtn{padding:4px 10px;border-radius:20px;font-size:.72rem;border:1px solid var(--bd);background:transparent;color:var(--t2);cursor:pointer;}
+.fqbtn.active{background:var(--pug);border-color:rgba(155,114,239,.5);color:var(--pu);}
+.lsel{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;}
+.tbar{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;font-size:.78rem;}
+.tbar span{color:var(--t2);}.tbar strong{color:var(--am);font-family:"DM Mono",monospace;}
+.bwpp{background:#25D366;color:#fff;border:none;padding:9px 16px;border-radius:var(--rs);font-size:.82rem;font-weight:600;font-family:"DM Sans",sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:5px;}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--sf2);border:1px solid var(--bd2);border-radius:8px;padding:10px 18px;font-size:.82rem;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;}
+@media(max-width:480px){.stats{grid-template-columns:1fr 1fr;}.sc:last-child{grid-column:span 2;}.fr{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
 
+<div class="login-screen" id="ls">
+  <div class="login-logo">R$</div>
+  <div class="login-title">Devedor<span>App</span></div>
+  <div class="login-sub">Controle seus devedores e envie cobranças pelo WhatsApp. Dados salvos na nuvem.</div>
+  <button class="btn-google" onclick="fazerLogin()">
+    <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+    Entrar com Google
+  </button>
+  <div class="login-note">Cada pessoa vê apenas seus próprios dados.</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
 <header>
   <div class="logo">Devedor<span>App</span></div>
-  <div class="header-right">
-    <button class="notif-btn" id="notif-btn" onclick="pedirPermissaoNotif()">🔔 Notif</button>
-    <button class="btn btn-ghost" style="font-size:.78rem;padding:6px 11px" onclick="openModal('modal-add')">＋ Novo</button>
+  <div class="hright">
+    <div class="sync-dot sload" id="sdot"></div>
+    <div class="uarea" onclick="toggleUM()">
+      <img class="uavatar" id="uav" src="" style="display:none">
+      <div class="upholder" id="uph">?</div>
+      <div class="umenu" id="umenu">
+        <div class="umname"><div id="mnom">...</div><div class="umemail" id="meml"></div></div>
+        <div class="umitem" onclick="exportData()">📦 Exportar backup</div>
+        <div class="umitem danger" onclick="fazerLogout()">↩ Sair</div>
+      </div>
+    </div>
+    <button class="btn bprim" style="font-size:.78rem;padding:6px 11px" onclick="openModal('madd')">＋ Novo</button>
   </div>
 </header>
 
 <main>
-  <!-- BANNER NOTIFICAÇÃO -->
-  <div class="notif-banner hidden" id="notif-banner" onclick="pedirPermissaoNotif()">
-    <span style="font-size:1.2rem">🔔</span>
-    <div>
-      <div style="font-weight:600;color:var(--purple)">Ativar lembretes de cobrança</div>
-      <div style="color:var(--text-muted);font-size:.75rem">Toque aqui para receber notificações no celular</div>
-    </div>
-    <span style="color:var(--purple);margin-left:auto">→</span>
-  </div>
-
-  <!-- STATS -->
   <div class="stats">
-    <div class="stat-card total"><div class="stat-label">Total em Aberto</div><div class="stat-value" id="stat-total">R$ 0</div><div class="stat-sub" id="stat-count">0 devedores</div></div>
-    <div class="stat-card pendentes"><div class="stat-label">Pendentes</div><div class="stat-value" id="stat-pendentes">0</div><div class="stat-sub" id="stat-cont">0 contínuos</div></div>
-    <div class="stat-card recebido"><div class="stat-label">Já Recebido</div><div class="stat-value" id="stat-recebido">R$ 0</div><div class="stat-sub" id="stat-pagos">0 pagos</div></div>
+    <div class="sc tot"><div class="slabel">Total em Aberto</div><div class="sval" id="st">R$ 0</div><div class="ssub" id="sc2">0 devedores</div></div>
+    <div class="sc pen"><div class="slabel">Pendentes</div><div class="sval" id="sp">0</div><div class="ssub" id="sco">0 contínuos</div></div>
+    <div class="sc rec"><div class="slabel">Já Recebido</div><div class="sval" id="sr">R$ 0</div><div class="ssub" id="spg">0 pagos</div></div>
   </div>
-
-  <!-- TABS -->
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('devedores',this)">💰 Devedores</button>
-    <button class="tab" onclick="switchTab('lembretes',this)">🔔 Lembretes</button>
-    <button class="tab" onclick="switchTab('cobranca',this)">📨 Cobrança</button>
-    <button class="tab" onclick="switchTab('historico',this)">📋 Histórico</button>
-    <button class="tab" onclick="switchTab('config',this)">⚙️</button>
+    <button class="tab active" onclick="switchTab('dv',this)">💰 Devedores</button>
+    <button class="tab" onclick="switchTab('lm',this)">🔔 Lembretes</button>
+    <button class="tab" onclick="switchTab('cb',this)">📨 Cobrança</button>
+    <button class="tab" onclick="switchTab('ht',this)">📋 Histórico</button>
+    <button class="tab" onclick="switchTab('cf',this)">⚙️</button>
   </div>
 
-  <!-- DEVEDORES -->
-  <div class="panel active" id="panel-devedores">
-    <div class="search-wrap"><input type="text" id="search" placeholder="Buscar por nome..." oninput="renderDevedores()"></div>
-    <div class="filter-chips">
-      <button class="chip active" onclick="setFilter('todos',this)">Todos</button>
-      <button class="chip" onclick="setFilter('pendente',this)">Pendentes</button>
-      <button class="chip" onclick="setFilter('continuo',this)">↺ Contínuos</button>
-      <button class="chip" onclick="setFilter('lembrete',this)">🔔 Com Lembrete</button>
-      <button class="chip" onclick="setFilter('pago',this)">Pagos</button>
+  <div class="panel active" id="panel-dv">
+    <div class="sw"><input type="text" id="search" placeholder="Buscar..." oninput="renderDV()"></div>
+    <div class="fchips">
+      <button class="chip active" onclick="setFil('todos',this)">Todos</button>
+      <button class="chip" onclick="setFil('pendente',this)">Pendentes</button>
+      <button class="chip" onclick="setFil('continuo',this)">↺ Contínuos</button>
+      <button class="chip" onclick="setFil('pago',this)">Pagos</button>
     </div>
-    <div id="list-devedores"></div>
+    <div id="ldv"></div>
   </div>
 
-  <!-- LEMBRETES -->
-  <div class="panel" id="panel-lembretes">
-    <div class="config-section" style="margin-bottom:16px">
-      <div class="config-title">🔔 Como funcionam os lembretes</div>
-      <p style="font-size:.78rem;color:var(--text-muted);line-height:1.6">
-        Configure um lembrete por devedor. O app vai mandar uma <strong style="color:var(--text)">notificação no seu celular</strong> na hora marcada dizendo que você precisa cobrar aquela pessoa.<br><br>
-        💡 <strong style="color:var(--amber)">Dica:</strong> Instale o app na tela inicial do celular para receber notificações mesmo com o app fechado.
-      </p>
-    </div>
-    <div id="list-lembretes"></div>
+  <div class="panel" id="panel-lm">
+    <div class="csec" style="margin-bottom:16px"><div class="ctitle">🔔 Lembretes de Cobrança</div><p style="font-size:.78rem;color:var(--t2);line-height:1.6">Notificações no celular na hora certa para cobrar.</p></div>
+    <div id="llm"></div>
   </div>
 
-  <!-- COBRANÇA -->
-  <div class="panel" id="panel-cobranca">
-    <div class="config-section">
-      <div class="config-title">📨 Gerar Mensagem</div>
-      <div class="form-group">
-        <label>Selecionar Devedor</label>
-        <select id="sel-devedor-msg" onchange="previewMsg()">
-          <option value="">— escolha um devedor —</option>
+  <div class="panel" id="panel-cb">
+    <div class="csec">
+      <div class="ctitle">📨 Gerar Mensagem</div>
+      <div class="fg"><label>Devedor</label><select id="smsg" onchange="prevMsg()"><option value="">— escolha —</option></select></div>
+      <div class="fg"><label>Tom</label>
+        <select id="stom" onchange="prevMsg()">
+          <option value="gentil">😊 Gentil</option><option value="formal">📋 Formal</option>
+          <option value="firme">⚡ Firme</option><option value="ultimo">🚨 Último Aviso</option>
         </select>
       </div>
-      <div class="form-group">
-        <label>Tom da Mensagem</label>
-        <select id="sel-tom" onchange="previewMsg()">
-          <option value="lembrete">🗓️ Lembrete de Vencimento</option>
-          <option value="gentil">😊 Gentil / Amigável</option>
-          <option value="formal">📋 Formal</option>
-          <option value="firme">⚡ Firme</option>
-          <option value="ultimo">🚨 Último Aviso</option>
-        </select>
-      </div>
-      <div id="msg-preview-wrap" style="display:none">
-        <label>Mensagem Gerada</label>
-        <div class="msg-box"><button class="copy-btn" onclick="copyMsg()">Copiar</button><span id="msg-text"></span></div>
+      <div id="mpw" style="display:none">
+        <label>Mensagem</label>
+        <div class="msgbox"><button class="cbtn" onclick="copyMsg()">Copiar</button><span id="mtxt"></span></div>
         <div style="display:flex;gap:7px;margin-top:10px;flex-wrap:wrap">
-          <button class="btn-wpp" onclick="sendWhatsApp()"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>Enviar WhatsApp</button>
-          <button class="btn btn-ghost" onclick="previewMsg()">🔄 Regenerar</button>
+          <button class="bwpp" onclick="sendWpp()"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>Enviar WhatsApp</button>
+          <button class="btn bghost" onclick="prevMsg()">🔄 Regenerar</button>
         </div>
       </div>
     </div>
-    <div class="config-section">
-      <div class="config-title">↺ Devedores Contínuos</div>
-      <div id="lista-continuos"></div>
-    </div>
+    <div class="csec"><div class="ctitle">↺ Contínuos</div><div id="lcont"></div></div>
   </div>
 
-  <!-- HISTÓRICO -->
-  <div class="panel" id="panel-historico">
+  <div class="panel" id="panel-ht">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem">Atividade</div>
-      <button class="btn btn-ghost" style="font-size:.72rem;padding:5px 9px" onclick="clearHistorico()">Limpar</button>
+      <div style="font-family:Syne,sans-serif;font-weight:700;font-size:.95rem">Atividade</div>
+      <button class="btn bghost" style="font-size:.72rem;padding:5px 9px" onclick="clearHist()">Limpar</button>
     </div>
-    <div class="config-section" style="padding:0;overflow:hidden"><div id="list-historico"></div></div>
+    <div class="csec" style="padding:0;overflow:hidden"><div id="lht"></div></div>
   </div>
 
-  <!-- CONFIG -->
-  <div class="panel" id="panel-config">
-    <div class="config-section">
-      <div class="config-title">👤 Sua Assinatura</div>
-      <p style="font-size:.78rem;color:var(--text-muted);margin-bottom:12px">Aparece no final de cada mensagem de cobrança.</p>
-      <div class="form-group"><label>Seu Nome / Negócio</label><input type="text" id="cfg-nome" placeholder="Ex: Paulo" oninput="saveConfig()"></div>
-      <div class="form-group"><label>Telefone / WhatsApp</label><input type="text" id="cfg-tel" placeholder="(xx) 9xxxx-xxxx" oninput="saveConfig()"></div>
-      <div class="form-group"><label>Pix / Info extra (opcional)</label><input type="text" id="cfg-extra" placeholder="Pix: 00000-000" oninput="saveConfig()"></div>
+  <div class="panel" id="panel-cf">
+    <div class="csec">
+      <div class="ctitle">👤 Assinatura nas Mensagens</div>
+      <div class="fg"><label>Nome / Negócio</label><input type="text" id="cnome" placeholder="Ex: Paulo" oninput="saveCfg()"></div>
+      <div class="fg"><label>Telefone</label><input type="text" id="ctel" placeholder="(xx) 9xxxx-xxxx" oninput="saveCfg()"></div>
+      <div class="fg"><label>Pix / Info extra</label><input type="text" id="cext" placeholder="Pix: 000.000.000-00" oninput="saveCfg()"></div>
     </div>
-    <div class="config-section">
-      <div class="config-title">🔔 Notificações</div>
-      <div id="notif-status" style="font-size:.82rem;color:var(--text-muted);margin-bottom:10px"></div>
-      <button class="btn btn-purple" onclick="pedirPermissaoNotif()">Ativar / Verificar Notificações</button>
-    </div>
-    <div class="config-section">
-      <div class="config-title">📦 Backup</div>
-      <div style="display:flex;gap:7px;flex-wrap:wrap">
-        <button class="btn btn-ghost" onclick="exportData()">⬇ Exportar</button>
-        <label class="btn btn-ghost" style="cursor:pointer">⬆ Importar<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
-      </div>
-    </div>
-    <div class="config-section">
-      <div class="config-title">🗑️ Dados</div>
-      <button class="btn btn-danger" onclick="limparTudo()">Apagar tudo</button>
-    </div>
+    <div class="csec"><div class="ctitle">☁️ Conta</div><div id="cinfo" style="font-size:.82rem;color:var(--t2)">...</div></div>
+    <div class="csec"><div class="ctitle">📦 Backup</div><button class="btn bghost" onclick="exportData()">⬇ Exportar JSON</button></div>
   </div>
 </main>
 
-<button class="fab" onclick="openModal('modal-add')">＋</button>
+<button class="fab" onclick="openModal('madd')">＋</button>
 
-<!-- MODAL: NOVO DEVEDOR -->
-<div class="overlay" id="modal-add">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title">Novo <span>Devedor</span></div>
-    <div class="form-group"><label>Nome</label><input type="text" id="f-nome" placeholder="Nome do devedor"></div>
-    <div class="form-row">
-      <div class="form-group"><label>Valor Devido (R$)</label><input type="number" id="f-valor" placeholder="0,00" min="0" step="0.01"></div>
-      <div class="form-group"><label>Data</label><input type="date" id="f-data"></div>
+<!-- MODAL NOVO -->
+<div class="overlay" id="madd">
+  <div class="modal"><div class="mhandle"></div><div class="mtitle">Novo <span>Devedor</span></div>
+    <div class="fg"><label>Nome</label><input type="text" id="fnom" placeholder="Nome"></div>
+    <div class="fr">
+      <div class="fg"><label>Valor (R$)</label><input type="number" id="fval" placeholder="0,00" min="0" step="0.01"></div>
+      <div class="fg"><label>Data</label><input type="date" id="fdat"></div>
     </div>
-    <div class="form-group"><label>Descrição</label><textarea id="f-desc" placeholder="fiado, empréstimo, serviço..."></textarea></div>
-    <div class="form-group"><label>Telefone (para WhatsApp)</label><input type="text" id="f-tel" placeholder="(xx) 9xxxx-xxxx"></div>
-    <div class="toggle-row" style="margin-bottom:10px">
-      <div><div class="toggle-label">↺ Devedor Contínuo</div><div class="toggle-sub">Deve com frequência</div></div>
-      <label class="toggle"><input type="checkbox" id="f-continuo"><span class="toggle-slider"></span></label>
-    </div>
-    <div class="toggle-row">
-      <div><div class="toggle-label">🔔 Criar Lembrete Agora</div><div class="toggle-sub">Notificação para cobrar</div></div>
-      <label class="toggle"><input type="checkbox" id="f-add-lembrete" onchange="toggleLembreteForm('f-lembrete-form')"><span class="toggle-slider"></span></label>
-    </div>
-    <div id="f-lembrete-form" style="display:none;margin-top:10px">
-      <div class="lembrete-form">
-        <div class="lembrete-form-title">🔔 Configurar Lembrete</div>
-        <div class="form-row">
-          <div class="form-group"><label>Data do Lembrete</label><input type="date" id="f-l-data"></div>
-          <div class="form-group"><label>Horário</label><input type="time" id="f-l-hora" value="09:00"></div>
+    <div class="fg"><label>Descrição</label><textarea id="fdesc" placeholder="fiado, empréstimo..."></textarea></div>
+    <div class="fg"><label>Telefone</label><input type="text" id="ftel" placeholder="(xx) 9xxxx-xxxx"></div>
+    <div class="trow"><div><div class="tlabel">↺ Contínuo</div><div class="tsub">Deve com frequência</div></div>
+      <label class="toggle"><input type="checkbox" id="fcont"><span class="tslider"></span></label></div>
+    <div class="trow"><div><div class="tlabel">🔔 Criar Lembrete</div><div class="tsub">Notificação para cobrar</div></div>
+      <label class="toggle"><input type="checkbox" id="falm" onchange="togLF()"><span class="tslider"></span></label></div>
+    <div id="flform" style="display:none;margin-top:10px">
+      <div class="lform"><div class="lfttitle">🔔 Lembrete</div>
+        <div class="fr">
+          <div class="fg"><label>Data</label><input type="date" id="fldat"></div>
+          <div class="fg"><label>Hora</label><input type="time" id="flhor" value="09:00"></div>
         </div>
-        <div class="form-group">
-          <label>Repetir</label>
-          <div class="lembrete-sel">
-            <button type="button" class="freq-btn active" data-freq="nao" onclick="selFreq(this,'f')">Não repetir</button>
-            <button type="button" class="freq-btn" data-freq="semanal" onclick="selFreq(this,'f')">Semanal</button>
-            <button type="button" class="freq-btn" data-freq="mensal" onclick="selFreq(this,'f')">Mensal</button>
+        <div class="fg"><label>Repetir</label>
+          <div class="lsel">
+            <button type="button" class="fqbtn active" data-fq="nao" onclick="selFQ(this,'f')">Não repetir</button>
+            <button type="button" class="fqbtn" data-fq="semanal" onclick="selFQ(this,'f')">Semanal</button>
+            <button type="button" class="fqbtn" data-fq="mensal" onclick="selFQ(this,'f')">Mensal</button>
           </div>
         </div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-add')">Cancelar</button>
-      <button class="btn btn-primary" onclick="addDevedor()">Salvar</button>
-    </div>
+    <div class="mfooter"><button class="btn bghost" onclick="closeModal('madd')">Cancelar</button><button class="btn bprim" onclick="addDV()">Salvar</button></div>
   </div>
 </div>
 
-<!-- MODAL: PAGAMENTO -->
-<div class="overlay" id="modal-pag">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title">💵 Registrar <span>Pagamento</span></div>
-    <input type="hidden" id="pag-id">
-    <div id="pag-info" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:11px;margin-bottom:14px;font-size:.83rem"></div>
-    <div class="form-group"><label>Tipo</label>
-      <select id="pag-tipo" onchange="togglePagTipo()">
-        <option value="total">✅ Pagamento Total</option>
-        <option value="parcial">💧 Pagamento Parcial</option>
-      </select>
-    </div>
-    <div class="form-group" id="pag-parcial-wrap" style="display:none"><label>Valor Pago (R$)</label><input type="number" id="pag-valor" placeholder="0,00" min="0" step="0.01"></div>
-    <div class="form-group"><label>Observação</label><input type="text" id="pag-obs" placeholder="Pix, dinheiro, parcial..."></div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-pag')">Cancelar</button>
-      <button class="btn btn-primary" onclick="registrarPagamento()">Confirmar</button>
-    </div>
+<!-- MODAL PAG -->
+<div class="overlay" id="mpag">
+  <div class="modal"><div class="mhandle"></div><div class="mtitle">💵 <span>Pagamento</span></div>
+    <input type="hidden" id="pagid">
+    <div id="paginfo" style="background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:11px;margin-bottom:14px;font-size:.83rem"></div>
+    <div class="fg"><label>Tipo</label><select id="pagtp" onchange="togPag()"><option value="total">✅ Total</option><option value="parcial">💧 Parcial</option></select></div>
+    <div class="fg" id="pagpw" style="display:none"><label>Valor Pago (R$)</label><input type="number" id="pagvl" min="0" step="0.01"></div>
+    <div class="fg"><label>Observação</label><input type="text" id="pagob" placeholder="Pix, dinheiro..."></div>
+    <div class="mfooter"><button class="btn bghost" onclick="closeModal('mpag')">Cancelar</button><button class="btn bprim" onclick="regPag()">Confirmar</button></div>
   </div>
 </div>
 
-<!-- MODAL: EDITAR -->
-<div class="overlay" id="modal-edit">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title">Editar <span>Devedor</span></div>
-    <input type="hidden" id="e-id">
-    <div class="form-group"><label>Nome</label><input type="text" id="e-nome"></div>
-    <div class="form-row">
-      <div class="form-group"><label>Valor (R$)</label><input type="number" id="e-valor" min="0" step="0.01"></div>
-      <div class="form-group"><label>Data</label><input type="date" id="e-data"></div>
+<!-- MODAL EDIT -->
+<div class="overlay" id="medit">
+  <div class="modal"><div class="mhandle"></div><div class="mtitle">Editar <span>Devedor</span></div>
+    <input type="hidden" id="eid">
+    <div class="fg"><label>Nome</label><input type="text" id="enom"></div>
+    <div class="fr">
+      <div class="fg"><label>Valor (R$)</label><input type="number" id="eval" min="0" step="0.01"></div>
+      <div class="fg"><label>Data</label><input type="date" id="edat"></div>
     </div>
-    <div class="form-group"><label>Descrição</label><textarea id="e-desc"></textarea></div>
-    <div class="form-group"><label>Telefone</label><input type="text" id="e-tel"></div>
-    <div class="toggle-row">
-      <div><div class="toggle-label">↺ Devedor Contínuo</div></div>
-      <label class="toggle"><input type="checkbox" id="e-continuo"><span class="toggle-slider"></span></label>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-edit')">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarEdicao()">Salvar</button>
-    </div>
+    <div class="fg"><label>Descrição</label><textarea id="edesc"></textarea></div>
+    <div class="fg"><label>Telefone</label><input type="text" id="etel"></div>
+    <div class="trow"><div><div class="tlabel">↺ Contínuo</div></div><label class="toggle"><input type="checkbox" id="econt"><span class="tslider"></span></label></div>
+    <div class="mfooter"><button class="btn bghost" onclick="closeModal('medit')">Cancelar</button><button class="btn bprim" onclick="saveEdit()">Salvar</button></div>
   </div>
 </div>
 
-<!-- MODAL: LEMBRETE -->
-<div class="overlay" id="modal-lembrete">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title">🔔 Configurar <span>Lembrete</span></div>
-    <input type="hidden" id="l-devedor-id">
-    <div id="l-devedor-nome" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:14px;font-size:.85rem;font-weight:600"></div>
-    <div class="form-row">
-      <div class="form-group"><label>Data</label><input type="date" id="l-data"></div>
-      <div class="form-group"><label>Horário</label><input type="time" id="l-hora" value="09:00"></div>
+<!-- MODAL LEMBRETE -->
+<div class="overlay" id="mlmb">
+  <div class="modal"><div class="mhandle"></div><div class="mtitle">🔔 <span>Lembrete</span></div>
+    <input type="hidden" id="lmbid">
+    <div id="lmbnm" style="background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px;margin-bottom:14px;font-size:.85rem;font-weight:600"></div>
+    <div class="fr">
+      <div class="fg"><label>Data</label><input type="date" id="ldat"></div>
+      <div class="fg"><label>Hora</label><input type="time" id="lhor" value="09:00"></div>
     </div>
-    <div class="form-group">
-      <label>Repetir</label>
-      <div class="lembrete-sel">
-        <button type="button" class="freq-btn active" data-freq="nao" onclick="selFreq(this,'l')">Não repetir</button>
-        <button type="button" class="freq-btn" data-freq="semanal" onclick="selFreq(this,'l')">Toda semana</button>
-        <button type="button" class="freq-btn" data-freq="mensal" onclick="selFreq(this,'l')">Todo mês</button>
+    <div class="fg"><label>Repetir</label>
+      <div class="lsel">
+        <button type="button" class="fqbtn active" data-fq="nao" onclick="selFQ(this,'l')">Não repetir</button>
+        <button type="button" class="fqbtn" data-fq="semanal" onclick="selFQ(this,'l')">Semanal</button>
+        <button type="button" class="fqbtn" data-fq="mensal" onclick="selFQ(this,'l')">Mensal</button>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-lembrete')">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarLembrete()">Salvar Lembrete</button>
-    </div>
+    <div class="mfooter"><button class="btn bghost" onclick="closeModal('mlmb')">Cancelar</button><button class="btn bprim" onclick="saveLmb()">Salvar</button></div>
   </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
-// ════════════════════════════════
-// DATA
-// ════════════════════════════════
-let devedores = JSON.parse(localStorage.getItem('dapp_devedores') || '[]');
-let historico  = JSON.parse(localStorage.getItem('dapp_hist') || '[]');
-let lembretes  = JSON.parse(localStorage.getItem('dapp_lembretes') || '[]');
-let config     = JSON.parse(localStorage.getItem('dapp_config') || '{}');
-let filtroAtivo = 'todos';
-let freqSel = { f: 'nao', l: 'nao' };
+firebase.initializeApp({apiKey:"AIzaSyDfl6IJKGWGESwtSEaYw_zYIYLOHYPINzk",authDomain:"meus-gastos-9d631.firebaseapp.com",projectId:"meus-gastos-9d631",storageBucket:"meus-gastos-9d631.firebasestorage.app",messagingSenderId:"1052006244232",appId:"1:1052006244232:web:ecf33d0b872d3c1236243d"});
+const auth=firebase.auth(), db=firebase.firestore();
+let CU=null, DVS=[], LMBs=[], HISTs=[], CFG={}, FIL='todos', FQ={f:'nao',l:'nao'};
+let uDV,uLM,uHT,uCF;
 
-function save() {
-  localStorage.setItem('dapp_devedores', JSON.stringify(devedores));
-  localStorage.setItem('dapp_hist',      JSON.stringify(historico));
-  localStorage.setItem('dapp_lembretes', JSON.stringify(lembretes));
-  localStorage.setItem('dapp_config',    JSON.stringify(config));
-}
-
-function fmtR$(n) {
-  return 'R$\u00a0' + Number(n).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-}
-function fmtData(d) {
-  if (!d) return '';
-  const [y, m, dd] = d.split('-');
-  return `${dd}/${m}/${y}`;
-}
-function dataHoje() { return new Date().toISOString().split('T')[0]; }
-
-// ════════════════════════════════
-// SERVICE WORKER
-// ════════════════════════════════
-async function registrarSW() {
-  if (!('serviceWorker' in navigator)) return;
-  try {
-    const reg = await navigator.serviceWorker.register('./sw.js');
-    console.log('SW registrado', reg.scope);
-    // Envia lembretes para o SW checar
-    if (reg.active) reg.active.postMessage({ type: 'CHECK_LEMBRETES' });
-  } catch (e) { console.warn('SW falhou:', e); }
-}
-
-// ════════════════════════════════
-// NOTIFICAÇÕES
-// ════════════════════════════════
-async function pedirPermissaoNotif() {
-  if (!('Notification' in window)) {
-    alert('Seu navegador não suporta notificações. Use o Chrome no Android.');
-    return;
-  }
-  const perm = await Notification.requestPermission();
-  atualizarStatusNotif(perm);
-  if (perm === 'granted') {
-    document.getElementById('notif-banner').classList.add('hidden');
-    document.getElementById('notif-btn').classList.add('on');
-    document.getElementById('notif-btn').textContent = '🔔 Ativo';
-    // Notificação de boas vindas
-    new Notification('DevedorApp ativado! ✅', {
-      body: 'Você vai receber lembretes de cobrança aqui.',
-      icon: './icon-192.png'
-    });
-    sincronizarLembretesComSW();
-  }
-}
-
-function atualizarStatusNotif(perm) {
-  const el = document.getElementById('notif-status');
-  if (!el) return;
-  if (!('Notification' in window)) { el.textContent = '❌ Não suportado neste navegador'; return; }
-  if (perm === 'granted') { el.innerHTML = '<span style="color:var(--green)">✅ Notificações ativas</span>'; }
-  else if (perm === 'denied') { el.innerHTML = '<span style="color:var(--red)">🚫 Notificações bloqueadas — desbloqueie nas configurações do navegador</span>'; }
-  else { el.innerHTML = '<span style="color:var(--amber)">⚠️ Permissão não concedida ainda</span>'; }
-}
-
-async function sincronizarLembretesComSW() {
-  if (!('serviceWorker' in navigator)) return;
-  const reg = await navigator.serviceWorker.getRegistration();
-  if (!reg) return;
-  const agora = Date.now();
-  for (const l of lembretes) {
-    const ts = new Date(`${l.data}T${l.hora}`).getTime();
-    if (ts > agora) {
-      const d = devedores.find(x => x.id === l.devedorId);
-      if (!d) continue;
-      const msg = gerarMsg(d, 'gentil');
-      const tel = d.tel ? d.tel.replace(/\D/g, '') : '';
-      const wppUrl = tel ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}` : '';
-      const payload = {
-        swId: l.id,
-        id: l.id,
-        devedorId: l.devedorId,
-        nome: d.nome,
-        valor: fmtR$(d.valorRestante || d.valor),
-        timestamp: ts,
-        wppUrl,
-        disparado: false
-      };
-      // Salva no IndexedDB via SW message
-      const sw = reg.active || reg.waiting || reg.installing;
-      if (sw) sw.postMessage({ type: 'AGENDAR', lembrete: payload });
-    }
-  }
-}
-
-// Verifica lembretes localmente (backup quando app está aberto)
-function verificarLembretesLocal() {
-  if (Notification.permission !== 'granted') return;
-  const agora = Date.now();
-  for (const l of lembretes) {
-    const ts = new Date(`${l.data}T${l.hora}`).getTime();
-    if (ts <= agora && !l.disparadoLocal) {
-      const d = devedores.find(x => x.id === l.devedorId);
-      if (!d || d.status === 'pago') continue;
-      const msg = gerarMsg(d, d.continuo ? 'lembrete' : 'gentil');
-      const tel = d.tel ? d.tel.replace(/\D/g, '') : '';
-      const wppUrl = tel ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}` : '';
-      const notif = new Notification(`💰 Cobrar ${d.nome}`, {
-        body: `Deve ${fmtR$(d.valorRestante || d.valor)} — toque para abrir o WhatsApp`,
-        icon: './icon-192.png',
-        tag: `local-${l.id}`,
-        data: { wppUrl }
-      });
-      notif.onclick = () => { if (wppUrl) window.open(wppUrl, '_blank'); };
-      l.disparadoLocal = true;
-      addHist('alarm', `Lembrete disparado: cobrar ${d.nome}`);
-      // Reagendar se recorrente
-      if (l.freq === 'semanal') { l.data = proximaData(l.data, 7); l.disparadoLocal = false; }
-      if (l.freq === 'mensal') { l.data = proximaDataMes(l.data); l.disparadoLocal = false; }
-      save();
-    }
-  }
-}
-
-function proximaData(dataStr, dias) {
-  const d = new Date(dataStr + 'T12:00:00');
-  d.setDate(d.getDate() + dias);
-  return d.toISOString().split('T')[0];
-}
-function proximaDataMes(dataStr) {
-  const d = new Date(dataStr + 'T12:00:00');
-  d.setMonth(d.getMonth() + 1);
-  return d.toISOString().split('T')[0];
-}
-
-// ════════════════════════════════
-// STATS
-// ════════════════════════════════
-function updateStats() {
-  const pendentes = devedores.filter(d => d.status !== 'pago');
-  const pagos     = devedores.filter(d => d.status === 'pago');
-  const continuos = devedores.filter(d => d.continuo && d.status !== 'pago');
-  const totalAberto = pendentes.reduce((s, d) => s + Number(d.valorRestante ?? d.valor), 0);
-  const totalRecebido = devedores.reduce((s, d) => {
-    return s + (d.pagamentos || []).reduce((a, p) => a + p.valor, 0);
-  }, 0);
-
-  document.getElementById('stat-total').textContent = fmtR$(totalAberto);
-  document.getElementById('stat-count').textContent = `${pendentes.length} devedor${pendentes.length !== 1 ? 'es' : ''}`;
-  document.getElementById('stat-pendentes').textContent = pendentes.length;
-  document.getElementById('stat-cont').textContent = `${continuos.length} contínuo${continuos.length !== 1 ? 's' : ''}`;
-  document.getElementById('stat-recebido').textContent = fmtR$(totalRecebido);
-  document.getElementById('stat-pagos').textContent = `${pagos.length} pago${pagos.length !== 1 ? 's' : ''}`;
-}
-
-// ════════════════════════════════
-// RENDER DEVEDORES
-// ════════════════════════════════
-function renderDevedores() {
-  const q = document.getElementById('search').value.toLowerCase();
-  let lista = devedores.filter(d => d.nome.toLowerCase().includes(q));
-  if (filtroAtivo === 'pendente') lista = lista.filter(d => d.status !== 'pago');
-  if (filtroAtivo === 'continuo') lista = lista.filter(d => d.continuo && d.status !== 'pago');
-  if (filtroAtivo === 'lembrete') lista = lista.filter(d => lembretes.some(l => l.devedorId === d.id));
-  if (filtroAtivo === 'pago')    lista = lista.filter(d => d.status === 'pago');
-
-  const el = document.getElementById('list-devedores');
-  if (!lista.length) {
-    el.innerHTML = `<div class="empty"><div class="empty-icon">🏦</div><p>Nenhum devedor encontrado.</p></div>`;
-    return;
-  }
-
-  const totalFiltrado = lista.filter(d => d.status !== 'pago').reduce((s, d) => s + Number(d.valorRestante ?? d.valor), 0);
-  const barra = (filtroAtivo !== 'pago' && totalFiltrado > 0) ?
-    `<div class="totals-bar"><span>Total em aberto</span><strong>${fmtR$(totalFiltrado)}</strong></div>` : '';
-
-  el.innerHTML = barra + lista.map(d => {
-    const valor = d.valorRestante !== undefined ? d.valorRestante : d.valor;
-    const pags  = d.pagamentos || [];
-    const temLembrete = lembretes.find(l => l.devedorId === d.id);
-    const badge = d.status === 'pago'
-      ? `<span class="badge badge-pago">✓ Pago</span>`
-      : d.status === 'parcial'
-        ? `<span class="badge badge-parcial">↓ Parcial</span>`
-        : `<span class="badge badge-pendente">● Pendente</span>`;
-    return `
-    <div class="devedor-card ${d.status === 'pago' ? 'pago' : ''} ${d.continuo && d.status !== 'pago' ? 'continuo' : ''}" onclick="toggleCard('cb-${d.id}')">
-      ${d.continuo && d.status !== 'pago' ? `<div class="continuo-tag">↺ contínuo</div>` : ''}
-      ${temLembrete ? `<div class="lembrete-tag">🔔 ${fmtData(temLembrete.data)}</div>` : ''}
-      <div class="card-row">
-        <div class="devedor-nome">${d.nome}</div>
-        <div class="devedor-valor">${d.status === 'pago' ? `<span style="color:var(--green)">${fmtR$(d.valor)}</span>` : fmtR$(valor)}</div>
-      </div>
-      ${d.desc ? `<div class="devedor-desc">${d.desc}</div>` : ''}
-      <div class="devedor-meta">
-        ${badge}
-        ${d.data ? `<span class="devedor-data">${fmtData(d.data)}</span>` : ''}
-        ${pags.length ? `<span class="devedor-data" style="color:var(--blue)">${pags.length} pagto${pags.length > 1 ? 's' : ''}</span>` : ''}
-      </div>
-      <div class="card-body" id="cb-${d.id}">
-        ${d.tel ? `<div style="font-size:.76rem;color:var(--text-muted);margin-bottom:8px">📞 ${d.tel}</div>` : ''}
-        ${pags.length ? `<div style="font-size:.72rem;color:var(--text-dim);margin-bottom:8px;background:var(--bg);padding:7px;border-radius:6px">Pagamentos: ${pags.map(p => `<span style="color:var(--green)">${fmtR$(p.valor)}</span> em ${fmtData(p.data)}`).join(' · ')}</div>` : ''}
-        <div class="card-actions">
-          ${d.status !== 'pago' ? `<button class="btn-sm success" onclick="abrirPagamento('${d.id}',event)">💵 Pagar</button>` : ''}
-          ${d.tel ? `<button class="btn-sm" onclick="cobrarWpp('${d.id}',event)">📱 WhatsApp</button>` : ''}
-          <button class="btn-sm purple" onclick="abrirLembrete('${d.id}',event)">🔔 ${temLembrete ? 'Editar lembrete' : 'Lembrete'}</button>
-          <button class="btn-sm" onclick="abrirEdicao('${d.id}',event)">✏️</button>
-          <button class="btn-sm danger" onclick="deletarDevedor('${d.id}',event)">🗑️</button>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function toggleCard(id) {
-  const el = document.getElementById(id);
-  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
-}
-
-// ════════════════════════════════
-// ADICIONAR DEVEDOR
-// ════════════════════════════════
-function addDevedor() {
-  const nome  = document.getElementById('f-nome').value.trim();
-  const valor = parseFloat(document.getElementById('f-valor').value);
-  if (!nome || isNaN(valor) || valor <= 0) { alert('Preencha nome e valor!'); return; }
-  const d = {
-    id: Date.now().toString(),
-    nome, valor,
-    valorRestante: valor,
-    data: document.getElementById('f-data').value,
-    desc: document.getElementById('f-desc').value.trim(),
-    tel:  document.getElementById('f-tel').value.trim(),
-    continuo: document.getElementById('f-continuo').checked,
-    status: 'pendente',
-    pagamentos: [],
-    criadoEm: new Date().toISOString()
-  };
-  devedores.unshift(d);
-  addHist('add', `${nome} adicionado — ${fmtR$(valor)}`);
-
-  // Lembrete junto?
-  if (document.getElementById('f-add-lembrete').checked) {
-    const lData = document.getElementById('f-l-data').value;
-    const lHora = document.getElementById('f-l-hora').value;
-    if (lData && lHora) {
-      criarLembrete(d.id, lData, lHora, freqSel.f);
-    }
-  }
-
-  save(); updateStats(); renderDevedores(); populateSelects();
-  closeModal('modal-add'); resetForm();
-}
-
-function resetForm() {
-  ['f-nome','f-valor','f-desc','f-tel'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('f-data').value = dataHoje();
-  document.getElementById('f-continuo').checked = false;
-  document.getElementById('f-add-lembrete').checked = false;
-  document.getElementById('f-lembrete-form').style.display = 'none';
-  document.querySelectorAll('.freq-btn[data-freq]').forEach(b => b.classList.remove('active'));
-  document.querySelector('.freq-btn[data-freq="nao"]')?.classList.add('active');
-  freqSel.f = 'nao';
-}
-
-// ════════════════════════════════
-// LEMBRETE
-// ════════════════════════════════
-function abrirLembrete(id, e) {
-  if (e) e.stopPropagation();
-  const d = devedores.find(x => x.id === id);
-  if (!d) return;
-  const existente = lembretes.find(l => l.devedorId === id);
-  document.getElementById('l-devedor-id').value = id;
-  document.getElementById('l-devedor-nome').textContent = `🔔 Lembrete para: ${d.nome} (${fmtR$(d.valorRestante ?? d.valor)})`;
-  document.getElementById('l-data').value = existente ? existente.data : proximaData(dataHoje(), 3);
-  document.getElementById('l-hora').value = existente ? existente.hora : '09:00';
-  freqSel.l = existente ? existente.freq : 'nao';
-  document.querySelectorAll('#modal-lembrete .freq-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.freq === freqSel.l);
-  });
-  openModal('modal-lembrete');
-}
-
-function salvarLembrete() {
-  const devedorId = document.getElementById('l-devedor-id').value;
-  const data = document.getElementById('l-data').value;
-  const hora = document.getElementById('l-hora').value;
-  if (!data || !hora) { alert('Escolha data e horário!'); return; }
-  criarLembrete(devedorId, data, hora, freqSel.l);
-  save();
-  renderDevedores();
-  renderLembretes();
-  sincronizarLembretesComSW();
-  closeModal('modal-lembrete');
-  const d = devedores.find(x => x.id === devedorId);
-  if (d) addHist('alarm', `Lembrete criado: cobrar ${d.nome} em ${fmtData(data)}`);
-  save();
-}
-
-function criarLembrete(devedorId, data, hora, freq) {
-  // Remove lembrete existente do mesmo devedor
-  lembretes = lembretes.filter(l => l.devedorId !== devedorId);
-  lembretes.push({
-    id: `l-${Date.now()}`,
-    devedorId, data, hora,
-    freq: freq || 'nao',
-    criadoEm: new Date().toISOString()
-  });
-}
-
-function removerLembrete(id, e) {
-  if (e) e.stopPropagation();
-  lembretes = lembretes.filter(l => l.id !== id);
-  save(); renderLembretes(); renderDevedores();
-}
-
-function renderLembretes() {
-  const el = document.getElementById('list-lembretes');
-  if (!lembretes.length) {
-    el.innerHTML = `<div class="empty"><div class="empty-icon">🔔</div><p>Nenhum lembrete configurado.<br>Toque em um devedor e clique em 🔔 Lembrete.</p></div>`;
-    return;
-  }
-  const sorted = [...lembretes].sort((a, b) => new Date(a.data + 'T' + a.hora) - new Date(b.data + 'T' + b.hora));
-  el.innerHTML = sorted.map(l => {
-    const d = devedores.find(x => x.id === l.devedorId);
-    if (!d) return '';
-    const ts = new Date(l.data + 'T' + l.hora);
-    const passado = ts < new Date();
-    const freqTexto = l.freq === 'semanal' ? '↻ Repete semanalmente' : l.freq === 'mensal' ? '↻ Repete mensalmente' : 'Não repete';
-    return `
-    <div class="lembrete-card" style="${passado ? 'opacity:.5' : ''}">
-      <div class="lembrete-icon">${passado ? '✓' : '🔔'}</div>
-      <div class="lembrete-info">
-        <div class="lembrete-nome">${d.nome}</div>
-        <div class="lembrete-quando">${fmtData(l.data)} às ${l.hora} ${passado ? '— passado' : ''}</div>
-        <div class="lembrete-freq">${freqTexto} · ${fmtR$(d.valorRestante ?? d.valor)}</div>
-      </div>
-      <div class="lembrete-actions">
-        <button class="btn-sm purple" onclick="abrirLembrete('${d.id}',event)">✏️</button>
-        <button class="btn-sm danger" onclick="removerLembrete('${l.id}',event)">🗑️</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function toggleLembreteForm(id) {
-  const cb = document.getElementById('f-add-lembrete');
-  document.getElementById(id).style.display = cb.checked ? 'block' : 'none';
-  if (cb.checked) {
-    const amanha = proximaData(dataHoje(), 1);
-    document.getElementById('f-l-data').value = amanha;
-  }
-}
-
-function selFreq(btn, ctx) {
-  document.querySelectorAll(`#${ctx === 'f' ? 'f-lembrete-form' : 'modal-lembrete'} .freq-btn`).forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  freqSel[ctx] = btn.dataset.freq;
-}
-
-// ════════════════════════════════
-// EDITAR
-// ════════════════════════════════
-function abrirEdicao(id, e) {
-  if (e) e.stopPropagation();
-  const d = devedores.find(x => x.id === id);
-  if (!d) return;
-  document.getElementById('e-id').value = id;
-  document.getElementById('e-nome').value = d.nome;
-  document.getElementById('e-valor').value = d.valorRestante ?? d.valor;
-  document.getElementById('e-data').value = d.data || '';
-  document.getElementById('e-desc').value = d.desc || '';
-  document.getElementById('e-tel').value  = d.tel || '';
-  document.getElementById('e-continuo').checked = d.continuo || false;
-  openModal('modal-edit');
-}
-
-function salvarEdicao() {
-  const id = document.getElementById('e-id').value;
-  const d  = devedores.find(x => x.id === id);
-  if (!d) return;
-  d.nome = document.getElementById('e-nome').value.trim();
-  const novoValor = parseFloat(document.getElementById('e-valor').value);
-  d.valorRestante = novoValor;
-  if (d.status !== 'pago') d.valor = novoValor;
-  d.data     = document.getElementById('e-data').value;
-  d.desc     = document.getElementById('e-desc').value.trim();
-  d.tel      = document.getElementById('e-tel').value.trim();
-  d.continuo = document.getElementById('e-continuo').checked;
-  save(); updateStats(); renderDevedores(); populateSelects();
-  closeModal('modal-edit');
-}
-
-// ════════════════════════════════
-// DELETAR
-// ════════════════════════════════
-function deletarDevedor(id, e) {
-  if (e) e.stopPropagation();
-  const d = devedores.find(x => x.id === id);
-  if (!d || !confirm(`Remover "${d.nome}"?`)) return;
-  addHist('pay', `${d.nome} removido`);
-  devedores = devedores.filter(x => x.id !== id);
-  lembretes = lembretes.filter(l => l.devedorId !== id);
-  save(); updateStats(); renderDevedores(); renderLembretes(); populateSelects();
-}
-
-// ════════════════════════════════
-// PAGAMENTO
-// ════════════════════════════════
-function abrirPagamento(id, e) {
-  if (e) e.stopPropagation();
-  const d = devedores.find(x => x.id === id);
-  if (!d) return;
-  document.getElementById('pag-id').value = id;
-  const rest = d.valorRestante ?? d.valor;
-  document.getElementById('pag-info').innerHTML = `<strong style="color:var(--amber)">${d.nome}</strong><br>Em aberto: <strong style="color:var(--red)">${fmtR$(rest)}</strong>`;
-  document.getElementById('pag-tipo').value = 'total';
-  document.getElementById('pag-parcial-wrap').style.display = 'none';
-  document.getElementById('pag-obs').value = '';
-  openModal('modal-pag');
-}
-
-function togglePagTipo() {
-  document.getElementById('pag-parcial-wrap').style.display =
-    document.getElementById('pag-tipo').value === 'parcial' ? 'block' : 'none';
-}
-
-function registrarPagamento() {
-  const id = document.getElementById('pag-id').value;
-  const d  = devedores.find(x => x.id === id);
-  if (!d) return;
-  const tipo = document.getElementById('pag-tipo').value;
-  const rest = d.valorRestante ?? d.valor;
-
-  if (tipo === 'total') {
-    d.pagamentos.push({ valor: rest, data: dataHoje(), obs: document.getElementById('pag-obs').value });
-    d.valorRestante = 0;
-    d.status = 'pago';
-    addHist('pay', `${d.nome} — quitou ${fmtR$(rest)}`);
-    // Remove lembrete se pago
-    lembretes = lembretes.filter(l => l.devedorId !== id);
-  } else {
-    const vPago = parseFloat(document.getElementById('pag-valor').value);
-    if (isNaN(vPago) || vPago <= 0) { alert('Informe o valor pago!'); return; }
-    d.pagamentos.push({ valor: vPago, data: dataHoje(), obs: document.getElementById('pag-obs').value });
-    d.valorRestante = Math.max(0, rest - vPago);
-    d.status = d.valorRestante <= 0 ? 'pago' : 'parcial';
-    addHist('pay', `${d.nome} — pagou ${fmtR$(vPago)}, resta ${fmtR$(d.valorRestante)}`);
-  }
-  save(); updateStats(); renderDevedores(); renderLembretes(); closeModal('modal-pag');
-}
-
-// ════════════════════════════════
-// MENSAGEM COBRANÇA
-// ════════════════════════════════
-function getAssinatura() {
-  let s = '';
-  const nome  = (config.nome  || '').replace(/[^\w\sÀ-ÿ]/g, '').trim();
-  const tel   = (config.tel   || '').replace(/[^0-9\s()\-+]/g, '').trim();
-  const extra = (config.extra || '').trim();
-  if (nome)  s += `\n\nAtenciosamente,\n*${nome}*`;
-  if (tel)   s += `\n📞 ${tel}`;
-  if (extra) s += `\n${extra}`;
-  return s;
-}
-
-function gerarMsg(d, tom) {
-  const valor = fmtR$(d.valorRestante ?? d.valor);
-  const ass   = getAssinatura();
-  const nome  = d.nome.split(' ')[0];
-  const desc  = d.desc ? ` referente a *${d.desc}*` : '';
-  const pags  = d.pagamentos || [];
-  const histP = pags.length ? `\nJá recebemos *${fmtR$(pags.reduce((s,p) => s+p.valor, 0))}* em pagamentos anteriores.` : '';
-
-  const hoje = new Date().toLocaleDateString('pt-BR');
-  const msgs = {
-    lembrete: `Olá, *${nome}*! 👋\n\nPassando para lembrar que hoje, *${hoje}*, vence o pagamento${desc ? ' de *' + d.desc + '*' : ''} no valor de *${valor}*.\n\nQualquer dúvida, estou à disposição!${ass}`,
-    gentil: `Olá, *${nome}*! 😊\n\nPassando pra lembrar que ainda temos um valor em aberto de *${valor}*${desc}.\n\nQuando puder, me avisa para a gente acertar. Estou à disposição!${histP}${ass}`,
-    formal: `Prezado(a) *${nome}*,\n\nInformo que há um saldo pendente de *${valor}*${desc} em seu nome.\n\nSolicito gentilmente que entre em contato para regularização do débito.${histP}${ass}`,
-    firme:  `*${nome}*, boa tarde.\n\nHá um débito de *${valor}*${desc} em aberto que precisa ser quitado.\n\nPor favor, providencie o pagamento o quanto antes.${histP}${ass}`,
-    ultimo: `*${nome}*, notificação urgente.\n\n⚠️ Você possui um débito de *${valor}*${desc} em atraso.\n\nCaso não haja regularização em breve, serei obrigado(a) a tomar as devidas providências.\n\nEntre em contato IMEDIATAMENTE.${histP}${ass}`
-  };
-  return msgs[tom] || msgs.gentil;
-}
-
-function populateSelects() {
-  const sel = document.getElementById('sel-devedor-msg');
-  const pendentes = devedores.filter(d => d.status !== 'pago');
-  sel.innerHTML = '<option value="">— escolha um devedor —</option>' +
-    pendentes.map(d => `<option value="${d.id}">${d.nome} (${fmtR$(d.valorRestante ?? d.valor)})</option>`).join('');
-
-  const cont = document.getElementById('lista-continuos');
-  const continuos = devedores.filter(d => d.continuo && d.status !== 'pago');
-  cont.innerHTML = continuos.length
-    ? continuos.map(d => `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)">
-        <div><div style="font-weight:600;font-size:.86rem">${d.nome}</div><div style="font-size:.73rem;color:var(--text-muted)">${fmtR$(d.valorRestante ?? d.valor)}</div></div>
-        <div style="display:flex;gap:5px">
-          <button class="btn-sm" onclick="cobrarWpp('${d.id}',null)">📱</button>
-          <button class="btn-sm purple" onclick="abrirLembrete('${d.id}',null)">🔔</button>
-        </div>
-      </div>`).join('')
-    : '<div style="color:var(--text-dim);font-size:.8rem;padding:8px 0">Nenhum devedor contínuo.</div>';
-}
-
-function previewMsg() {
-  const id  = document.getElementById('sel-devedor-msg').value;
-  const tom = document.getElementById('sel-tom').value;
-  const wrap = document.getElementById('msg-preview-wrap');
-  if (!id) { wrap.style.display = 'none'; return; }
-  const d = devedores.find(x => x.id === id);
-  if (!d) return;
-  document.getElementById('msg-text').textContent = gerarMsg(d, tom);
-  wrap.style.display = 'block';
-}
-
-function copyMsg() {
-  const txt = document.getElementById('msg-text').textContent;
-  navigator.clipboard.writeText(txt).then(() => {
-    const btn = document.querySelector('.copy-btn');
-    const orig = btn.textContent;
-    btn.textContent = '✓ Copiado!';
-    setTimeout(() => btn.textContent = orig, 2000);
-  });
-}
-
-function sendWhatsApp() {
-  const id  = document.getElementById('sel-devedor-msg').value;
-  const msg = document.getElementById('msg-text').textContent;
-  if (!msg) return;
-  const d   = devedores.find(x => x.id === id);
-  const tel = d?.tel ? d.tel.replace(/\D/g,'') : '';
-  const url = tel ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
-  window.open(url, '_blank');
-  addHist('msg', `Cobrança enviada a ${d?.nome || 'devedor'}`);
-  save(); renderHistorico();
-}
-
-function cobrarWpp(id, e) {
-  if (e) e.stopPropagation();
-  const d = devedores.find(x => x.id === id);
-  if (!d) return;
-  const msg = gerarMsg(d, 'gentil');
-  const tel = d.tel ? d.tel.replace(/\D/g,'') : '';
-  const url = tel ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
-  window.open(url, '_blank');
-  addHist('msg', `Cobrança via WhatsApp: ${d.nome}`);
-  save(); renderHistorico();
-}
-
-// ════════════════════════════════
-// HISTÓRICO
-// ════════════════════════════════
-function addHist(tipo, texto) {
-  historico.unshift({ tipo, texto, hora: new Date().toLocaleString('pt-BR') });
-  if (historico.length > 100) historico = historico.slice(0, 100);
-}
-
-function renderHistorico() {
-  const el = document.getElementById('list-historico');
-  if (!historico.length) {
-    el.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><p>Sem atividade ainda.</p></div>`;
-    return;
-  }
-  el.innerHTML = historico.slice(0, 60).map(h => `
-    <div class="hist-item">
-      <div class="hist-dot ${h.tipo}"></div>
-      <div class="hist-info"><div class="hist-nome">${h.texto}</div></div>
-      <div class="hist-time">${h.hora}</div>
-    </div>`).join('');
-}
-
-function clearHistorico() {
-  if (!confirm('Limpar histórico?')) return;
-  historico = []; save(); renderHistorico();
-}
-
-// ════════════════════════════════
-// CONFIG
-// ════════════════════════════════
-function loadConfig() {
-  document.getElementById('cfg-nome').value  = config.nome  || '';
-  document.getElementById('cfg-tel').value   = config.tel   || '';
-  document.getElementById('cfg-extra').value = config.extra || '';
-}
-function saveConfig() {
-  config.nome  = document.getElementById('cfg-nome').value.trim();
-  config.tel   = document.getElementById('cfg-tel').value.trim();
-  config.extra = document.getElementById('cfg-extra').value.trim();
-  save();
-}
-
-// ════════════════════════════════
-// TABS
-// ════════════════════════════════
-function switchTab(name, btn) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  document.getElementById('panel-' + name).classList.add('active');
-  if (name === 'cobranca')  { populateSelects(); }
-  if (name === 'historico') { renderHistorico(); }
-  if (name === 'lembretes') { renderLembretes(); }
-  if (name === 'config')    { atualizarStatusNotif(Notification.permission); }
-}
-
-function setFilter(f, el) {
-  filtroAtivo = f;
-  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  renderDevedores();
-}
-
-// ════════════════════════════════
-// MODAL
-// ════════════════════════════════
-function openModal(id)  { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-document.querySelectorAll('.overlay').forEach(o => {
-  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+// ── AUTH ──
+auth.onAuthStateChanged(u=>{
+  if(u){CU=u;document.getElementById('ls').style.display='none';updateUI(u);startL();}
+  else{CU=null;document.getElementById('ls').style.display='flex';stopL();setSd('load');}
 });
+function fazerLogin(){auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e=>toast('Erro: '+e.message));}
+function fazerLogout(){if(!confirm('Sair?'))return;stopL();auth.signOut();toggleUM();}
+function updateUI(u){
+  const av=document.getElementById('uav'),ph=document.getElementById('uph');
+  if(u.photoURL){av.src=u.photoURL;av.style.display='block';ph.style.display='none';}
+  else{ph.textContent=(u.displayName||u.email||'?')[0].toUpperCase();ph.style.display='flex';av.style.display='none';}
+  document.getElementById('mnom').textContent=u.displayName||'Usuário';
+  document.getElementById('meml').textContent=u.email;
+  document.getElementById('cinfo').innerHTML=`<strong style="color:var(--t1)">${u.displayName||u.email}</strong><br><span style="font-size:.75rem">${u.email}</span><br><span style="font-size:.72rem;color:var(--gn);margin-top:4px;display:block">☁️ Sincronizado na nuvem</span>`;
+}
+function toggleUM(){document.getElementById('umenu').classList.toggle('open');}
+document.addEventListener('click',e=>{if(!e.target.closest('.uarea'))document.getElementById('umenu').classList.remove('open');});
 
-// ════════════════════════════════
-// DATA IO
-// ════════════════════════════════
-function exportData() {
-  const blob = new Blob([JSON.stringify({ devedores, historico, lembretes, config }, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `devedorapp_${dataHoje()}.json`;
-  a.click();
+// ── FIRESTORE ──
+function col(c){return db.collection('devedorapp').doc(CU.uid).collection(c);}
+function startL(){
+  setSd('load');
+  uDV=col('devedores').orderBy('criadoEm','desc').onSnapshot(s=>{DVS=s.docs.map(d=>({id:d.id,...d.data()}));stats();renderDV();popSels();setSd('ok');},()=>setSd('err'));
+  uLM=col('lembretes').onSnapshot(s=>{LMBs=s.docs.map(d=>({id:d.id,...d.data()}));renderDV();renderLmb();});
+  uHT=col('historico').orderBy('criadoEm','desc').limit(60).onSnapshot(s=>{HISTs=s.docs.map(d=>({id:d.id,...d.data()}));renderHist();});
+  uCF=db.collection('devedorapp').doc(CU.uid).onSnapshot(s=>{if(s.exists){CFG=s.data().config||{};loadCfg();}});
+}
+function stopL(){[uDV,uLM,uHT,uCF].forEach(u=>u&&u());}
+function setSd(s){const d=document.getElementById('sdot');d.className='sync-dot';d.classList.add(s==='ok'?'sok':s==='load'?'sload':'serr');}
+
+// ── HELPERS ──
+const R$=n=>'R$ '+Number(n).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+const fmtD=d=>{if(!d)return'';const[y,m,dd]=d.split('-');return`${dd}/${m}/${y}`;};
+const hoje=()=>new Date().toISOString().split('T')[0];
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+const TS=firebase.firestore.FieldValue.serverTimestamp;
+
+// ── STATS ──
+function stats(){
+  const pen=DVS.filter(d=>d.status!=='pago'),pgs=DVS.filter(d=>d.status==='pago'),con=DVS.filter(d=>d.continuo&&d.status!=='pago');
+  const ta=pen.reduce((s,d)=>s+Number(d.valorRestante??d.valor),0);
+  const tr=DVS.reduce((s,d)=>s+(d.pagamentos||[]).reduce((a,p)=>a+p.valor,0),0);
+  document.getElementById('st').textContent=R$(ta);
+  document.getElementById('sc2').textContent=`${pen.length} devedor${pen.length!==1?'es':''}`;
+  document.getElementById('sp').textContent=pen.length;
+  document.getElementById('sco').textContent=`${con.length} contínuo${con.length!==1?'s':''}`;
+  document.getElementById('sr').textContent=R$(tr);
+  document.getElementById('spg').textContent=`${pgs.length} pago${pgs.length!==1?'s':''}`;
 }
 
-function importData(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const r = new FileReader();
-  r.onload = ev => {
-    try {
-      const data = JSON.parse(ev.target.result);
-      if (data.devedores) devedores = data.devedores;
-      if (data.historico) historico = data.historico;
-      if (data.lembretes) lembretes = data.lembretes;
-      if (data.config)    config    = data.config;
-      save(); init(); alert('Dados importados!');
-    } catch { alert('Arquivo inválido.'); }
-  };
-  r.readAsText(file);
+// ── RENDER DEVEDORES ──
+function renderDV(){
+  const q=(document.getElementById('search').value||'').toLowerCase();
+  let lst=DVS.filter(d=>d.nome.toLowerCase().includes(q));
+  if(FIL==='pendente')lst=lst.filter(d=>d.status!=='pago');
+  if(FIL==='continuo')lst=lst.filter(d=>d.continuo&&d.status!=='pago');
+  if(FIL==='pago')lst=lst.filter(d=>d.status==='pago');
+  const el=document.getElementById('ldv');
+  if(!lst.length){el.innerHTML='<div class="empty"><div class="empty-icon">🏦</div><p>Nenhum devedor encontrado.</p></div>';return;}
+  const tot=lst.filter(d=>d.status!=='pago').reduce((s,d)=>s+Number(d.valorRestante??d.valor),0);
+  const bar=(FIL!=='pago'&&tot>0)?`<div class="tbar"><span>Total em aberto</span><strong>${R$(tot)}</strong></div>`:'';
+  el.innerHTML=bar+lst.map(d=>{
+    const val=d.valorRestante!==undefined?d.valorRestante:d.valor;
+    const pgs=d.pagamentos||[];
+    const tL=LMBs.find(l=>l.devedorId===d.id);
+    const bg=d.status==='pago'?'<span class="badge bpago">✓ Pago</span>':d.status==='parcial'?'<span class="badge bparc">↓ Parcial</span>':'<span class="badge bpend">● Pendente</span>';
+    return`<div class="dc ${d.status==='pago'?'pago':''} ${d.continuo&&d.status!=='pago'?'continuo':''}" onclick="togC('cb-${d.id}')">
+      ${d.continuo&&d.status!=='pago'?'<div class="ctag">↺ contínuo</div>':''}
+      ${tL?`<div class="ltag">🔔 ${fmtD(tL.data)}</div>`:''}
+      <div class="crow"><div class="dnome">${d.nome}</div><div class="dval">${d.status==='pago'?`<span style="color:var(--gn)">${R$(d.valor)}</span>`:R$(val)}</div></div>
+      ${d.desc?`<div class="ddesc">${d.desc}</div>`:''}
+      <div class="dmeta">${bg}${d.data?`<span class="ddata">${fmtD(d.data)}</span>`:''}${pgs.length?`<span class="ddata" style="color:var(--bl)">${pgs.length} pagto${pgs.length>1?'s':''}</span>`:''}</div>
+      <div class="cbody" id="cb-${d.id}">
+        ${d.tel?`<div style="font-size:.76rem;color:var(--t2);margin-bottom:8px">📞 ${d.tel}</div>`:''}
+        ${pgs.length?`<div style="font-size:.72rem;color:var(--t3);margin-bottom:8px;background:var(--bg);padding:7px;border-radius:6px">Pagamentos: ${pgs.map(p=>`<span style="color:var(--gn)">${R$(p.valor)}</span> em ${fmtD(p.data)}`).join(' · ')}</div>`:''}
+        <div class="cacts">
+          ${d.status!=='pago'?`<button class="bsm ok" onclick="abPag('${d.id}',event)">💵 Pagar</button>`:''}
+          ${d.tel?`<button class="bsm" onclick="cobWpp('${d.id}',event)">📱 WhatsApp</button>`:''}
+          <button class="bsm pu" onclick="abLmb('${d.id}',event)">🔔 ${tL?'Editar':'Lembrete'}</button>
+          <button class="bsm" onclick="abEdit('${d.id}',event)">✏️</button>
+          <button class="bsm danger" onclick="delDV('${d.id}',event)">🗑️</button>
+        </div>
+      </div></div>`;
+  }).join('');
+}
+function togC(id){const el=document.getElementById(id);if(el)el.style.display=el.style.display==='none'?'block':'none';}
+
+// ── ADD ──
+async function addDV(){
+  const nm=document.getElementById('fnom').value.trim(),vl=parseFloat(document.getElementById('fval').value);
+  if(!nm||isNaN(vl)||vl<=0){toast('Preencha nome e valor!');return;}
+  setSd('load');
+  try{
+    const ref=await col('devedores').add({nome:nm,valor:vl,valorRestante:vl,data:document.getElementById('fdat').value,desc:document.getElementById('fdesc').value.trim(),tel:document.getElementById('ftel').value.trim(),continuo:document.getElementById('fcont').checked,status:'pendente',pagamentos:[],criadoEm:TS()});
+    addH('add',`${nm} adicionado — ${R$(vl)}`);
+    if(document.getElementById('falm').checked){const ld=document.getElementById('fldat').value,lh=document.getElementById('flhor').value;if(ld&&lh)await criaLmb(ref.id,ld,lh,FQ.f);}
+    toast('✅ Salvo na nuvem!');closeModal('madd');resetF();
+  }catch(e){toast('Erro: '+e.message);setSd('err');}
+}
+function resetF(){['fnom','fval','fdesc','ftel'].forEach(i=>document.getElementById(i).value='');document.getElementById('fdat').value=hoje();document.getElementById('fcont').checked=false;document.getElementById('falm').checked=false;document.getElementById('flform').style.display='none';FQ.f='nao';}
+
+// ── EDIT ──
+function abEdit(id,e){if(e)e.stopPropagation();const d=DVS.find(x=>x.id===id);if(!d)return;document.getElementById('eid').value=id;document.getElementById('enom').value=d.nome;document.getElementById('eval').value=d.valorRestante??d.valor;document.getElementById('edat').value=d.data||'';document.getElementById('edesc').value=d.desc||'';document.getElementById('etel').value=d.tel||'';document.getElementById('econt').checked=d.continuo||false;openModal('medit');}
+async function saveEdit(){
+  const id=document.getElementById('eid').value,nv=parseFloat(document.getElementById('eval').value);
+  try{await col('devedores').doc(id).update({nome:document.getElementById('enom').value.trim(),valorRestante:nv,valor:nv,data:document.getElementById('edat').value,desc:document.getElementById('edesc').value.trim(),tel:document.getElementById('etel').value.trim(),continuo:document.getElementById('econt').checked});toast('✅ Atualizado!');closeModal('medit');}catch(e){toast('Erro: '+e.message);}
 }
 
-function limparTudo() {
-  if (!confirm('Apagar TODOS os dados?')) return;
-  devedores = []; historico = []; lembretes = []; config = {};
-  save(); init();
+// ── DELETE ──
+async function delDV(id,e){if(e)e.stopPropagation();const d=DVS.find(x=>x.id===id);if(!d||!confirm(`Remover "${d.nome}"?`))return;
+  try{await col('devedores').doc(id).delete();const l=LMBs.find(x=>x.devedorId===id);if(l)await col('lembretes').doc(l.id).delete();addH('pay',`${d.nome} removido`);}catch(e){toast('Erro: '+e.message);}
 }
 
-// ════════════════════════════════
-// INIT
-// ════════════════════════════════
-function init() {
-  document.getElementById('f-data').value = dataHoje();
-  loadConfig();
-  updateStats();
-  renderDevedores();
-  populateSelects();
-
-  // Banner notificação
-  if ('Notification' in window && Notification.permission !== 'granted') {
-    document.getElementById('notif-banner').classList.remove('hidden');
-  } else if (Notification.permission === 'granted') {
-    document.getElementById('notif-btn').classList.add('on');
-    document.getElementById('notif-btn').textContent = '🔔 Ativo';
-  }
+// ── PAGAMENTO ──
+function abPag(id,e){if(e)e.stopPropagation();const d=DVS.find(x=>x.id===id);if(!d)return;document.getElementById('pagid').value=id;const rs=d.valorRestante??d.valor;document.getElementById('paginfo').innerHTML=`<strong style="color:var(--am)">${d.nome}</strong><br>Em aberto: <strong style="color:var(--rd)">${R$(rs)}</strong>`;document.getElementById('pagtp').value='total';document.getElementById('pagpw').style.display='none';document.getElementById('pagob').value='';openModal('mpag');}
+function togPag(){document.getElementById('pagpw').style.display=document.getElementById('pagtp').value==='parcial'?'block':'none';}
+async function regPag(){
+  const id=document.getElementById('pagid').value,d=DVS.find(x=>x.id===id);if(!d)return;
+  const tp=document.getElementById('pagtp').value,rs=d.valorRestante??d.valor,ob=document.getElementById('pagob').value;
+  let up={};
+  if(tp==='total'){up={status:'pago',valorRestante:0,pagamentos:[...(d.pagamentos||[]),{valor:rs,data:hoje(),obs:ob}]};addH('pay',`${d.nome} — quitou ${R$(rs)}`);}
+  else{const vp=parseFloat(document.getElementById('pagvl').value);if(isNaN(vp)||vp<=0){toast('Informe o valor!');return;}const nr=Math.max(0,rs-vp);up={status:nr<=0?'pago':'parcial',valorRestante:nr,pagamentos:[...(d.pagamentos||[]),{valor:vp,data:hoje(),obs:ob}]};addH('pay',`${d.nome} — pagou ${R$(vp)}, resta ${R$(nr)}`);}
+  try{await col('devedores').doc(id).update(up);if(up.status==='pago'){const l=LMBs.find(x=>x.devedorId===id);if(l)await col('lembretes').doc(l.id).delete();}toast('✅ Registrado!');closeModal('mpag');}catch(e){toast('Erro: '+e.message);}
 }
 
-// Checagem periódica quando app está aberto
-setInterval(verificarLembretesLocal, 60_000);
-verificarLembretesLocal();
+// ── LEMBRETE ──
+function abLmb(id,e){if(e)e.stopPropagation();const d=DVS.find(x=>x.id===id);if(!d)return;const ex=LMBs.find(l=>l.devedorId===id);document.getElementById('lmbid').value=id;document.getElementById('lmbnm').textContent=`🔔 ${d.nome} — ${R$(d.valorRestante??d.valor)}`;document.getElementById('ldat').value=ex?ex.data:proxD(hoje(),3);document.getElementById('lhor').value=ex?ex.hora:'09:00';FQ.l=ex?ex.freq:'nao';document.querySelectorAll('#mlmb .fqbtn').forEach(b=>b.classList.toggle('active',b.dataset.fq===FQ.l));openModal('mlmb');}
+async function saveLmb(){const id=document.getElementById('lmbid').value,dt=document.getElementById('ldat').value,hr=document.getElementById('lhor').value;if(!dt||!hr){toast('Escolha data e hora!');return;}await criaLmb(id,dt,hr,FQ.l);const d=DVS.find(x=>x.id===id);if(d)addH('alarm',`Lembrete: cobrar ${d.nome} em ${fmtD(dt)}`);toast('🔔 Lembrete salvo!');closeModal('mlmb');}
+async function criaLmb(dvId,dt,hr,fq){const ex=LMBs.find(l=>l.devedorId===dvId);if(ex)await col('lembretes').doc(ex.id).delete();await col('lembretes').add({devedorId:dvId,data:dt,hora:hr,freq:fq||'nao',criadoEm:TS()});}
+async function delLmb(id,e){if(e)e.stopPropagation();await col('lembretes').doc(id).delete();toast('Lembrete removido');}
+function renderLmb(){
+  const el=document.getElementById('llm');
+  if(!LMBs.length){el.innerHTML='<div class="empty"><div class="empty-icon">🔔</div><p>Nenhum lembrete.<br>Toque em um devedor → 🔔 Lembrete.</p></div>';return;}
+  el.innerHTML=[...LMBs].sort((a,b)=>new Date(a.data+'T'+a.hora)-new Date(b.data+'T'+b.hora)).map(l=>{
+    const d=DVS.find(x=>x.id===l.devedorId);if(!d)return'';
+    const pass=new Date(l.data+'T'+l.hora)<new Date();
+    const ft=l.freq==='semanal'?'↻ Semanal':l.freq==='mensal'?'↻ Mensal':'Não repete';
+    return`<div class="lcard" style="${pass?'opacity:.5':''}"><div style="font-size:1.4rem">${pass?'✓':'🔔'}</div>
+    <div class="linfo"><div class="lnome">${d.nome}</div><div class="lquando">${fmtD(l.data)} às ${l.hora}${pass?' — passado':''}</div><div class="lfreq">${ft} · ${R$(d.valorRestante??d.valor)}</div></div>
+    <div style="display:flex;gap:5px"><button class="bsm pu" onclick="abLmb('${d.id}',event)">✏️</button><button class="bsm danger" onclick="delLmb('${l.id}',event)">🗑️</button></div></div>`;
+  }).join('');
+}
+function togLF(){document.getElementById('flform').style.display=document.getElementById('falm').checked?'block':'none';if(document.getElementById('falm').checked)document.getElementById('fldat').value=proxD(hoje(),1);}
+function selFQ(btn,ctx){const c=ctx==='f'?document.getElementById('flform'):document.getElementById('mlmb');c.querySelectorAll('.fqbtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');FQ[ctx]=btn.dataset.fq;}
+function proxD(ds,n){const d=new Date(ds+'T12:00:00');d.setDate(d.getDate()+n);return d.toISOString().split('T')[0];}
+function chkLmbs(){
+  if(Notification.permission!=='granted')return;
+  LMBs.forEach(async l=>{
+    if(new Date(l.data+'T'+l.hora).getTime()<=Date.now()){
+      const d=DVS.find(x=>x.id===l.devedorId);if(!d||d.status==='pago')return;
+      const nt=new Notification(`💰 Cobrar ${d.nome}`,{body:`Deve ${R$(d.valorRestante??d.valor)}`,icon:'./icon-192.png',tag:`lmb-${l.id}`});
+      const msg=genMsg(d,'gentil'),tel=d.tel?d.tel.replace(/\D/g,''):'';
+      nt.onclick=()=>{if(tel)window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`,'_blank');};
+      addH('alarm',`Lembrete: cobrar ${d.nome}`);
+      if(l.freq==='semanal')await col('lembretes').doc(l.id).update({data:proxD(l.data,7)});
+      else if(l.freq==='mensal'){const nd=new Date(l.data+'T12:00:00');nd.setMonth(nd.getMonth()+1);await col('lembretes').doc(l.id).update({data:nd.toISOString().split('T')[0]});}
+    }
+  });
+}
 
-registrarSW();
-init();
+// ── COBRANÇA ──
+function getAss(){let s='';if(CFG.nome)s+=`
+
+Atenciosamente,
+*${CFG.nome}*`;if(CFG.tel)s+=`
+📞 ${CFG.tel}`;if(CFG.ext)s+=`
+${CFG.ext}`;return s;}
+function genMsg(d,tom){
+  const val=R$(d.valorRestante??d.valor),ass=getAss(),nm=d.nome.split(' ')[0],desc=d.desc?` referente a *${d.desc}*`:'';
+  const histP=(d.pagamentos||[]).length?`
+Já recebemos *${R$((d.pagamentos||[]).reduce((s,p)=>s+p.valor,0))}* em pagamentos anteriores.`:'';
+  return{gentil:`Olá, *${nm}*! 😊
+
+Passando pra lembrar que há um valor em aberto de *${val}*${desc}.
+
+Quando puder, me avisa!${histP}${ass}`,formal:`Prezado(a) *${nm}*,
+
+Informo que há um saldo de *${val}*${desc} pendente.
+
+Solicito contato para regularização.${histP}${ass}`,firme:`*${nm}*, há um débito de *${val}*${desc} em aberto.
+
+Por favor, providencie o pagamento.${histP}${ass}`,ultimo:`*${nm}*, notificação urgente.
+
+⚠️ Débito de *${val}*${desc} em atraso.
+
+Entre em contato IMEDIATAMENTE.${histP}${ass}`}[tom]||'';
+}
+function popSels(){
+  const pen=DVS.filter(d=>d.status!=='pago');
+  document.getElementById('smsg').innerHTML='<option value="">— escolha —</option>'+pen.map(d=>`<option value="${d.id}">${d.nome} (${R$(d.valorRestante??d.valor)})</option>`).join('');
+  const con=DVS.filter(d=>d.continuo&&d.status!=='pago');
+  document.getElementById('lcont').innerHTML=con.length?con.map(d=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--bd)"><div><div style="font-weight:600;font-size:.86rem">${d.nome}</div><div style="font-size:.73rem;color:var(--t2)">${R$(d.valorRestante??d.valor)}</div></div><div style="display:flex;gap:5px"><button class="bsm" onclick="cobWpp('${d.id}',null)">📱</button><button class="bsm pu" onclick="abLmb('${d.id}',null)">🔔</button></div></div>`).join(''):'<div style="color:var(--t3);font-size:.8rem;padding:8px 0">Nenhum contínuo.</div>';
+}
+function prevMsg(){const id=document.getElementById('smsg').value,tom=document.getElementById('stom').value,w=document.getElementById('mpw');if(!id){w.style.display='none';return;}const d=DVS.find(x=>x.id===id);if(!d)return;document.getElementById('mtxt').textContent=genMsg(d,tom);w.style.display='block';}
+function copyMsg(){navigator.clipboard.writeText(document.getElementById('mtxt').textContent).then(()=>{const b=document.querySelector('.cbtn');b.textContent='✓ Copiado!';setTimeout(()=>b.textContent='Copiar',2000);});}
+function sendWpp(){const id=document.getElementById('smsg').value,msg=document.getElementById('mtxt').textContent;if(!msg)return;const d=DVS.find(x=>x.id===id),tel=d?.tel?d.tel.replace(/\D/g,''):'';window.open(tel?`https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`:`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');addH('msg',`Cobrança: ${d?.nome||'devedor'}`);}
+function cobWpp(id,e){if(e)e.stopPropagation();const d=DVS.find(x=>x.id===id);if(!d)return;const msg=genMsg(d,'gentil'),tel=d.tel?d.tel.replace(/\D/g,''):'';window.open(tel?`https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`:`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');addH('msg',`WhatsApp: ${d.nome}`);}
+
+// ── HISTÓRICO ──
+function addH(tp,tx){if(!CU)return;col('historico').add({tipo:tp,texto:tx,criadoEm:TS()});}
+function renderHist(){const el=document.getElementById('lht');if(!HISTs.length){el.innerHTML='<div class="empty"><div class="empty-icon">📋</div><p>Sem atividade.</p></div>';return;}el.innerHTML=HISTs.map(h=>`<div class="hitem"><div class="hdot ${h.tipo}"></div><div class="hinfo"><div class="hnome">${h.texto}</div></div><div class="htime">${h.criadoEm?.toDate?h.criadoEm.toDate().toLocaleString('pt-BR'):''}</div></div>`).join('');}
+async function clearHist(){if(!confirm('Limpar?'))return;const s=await col('historico').get();const b=db.batch();s.docs.forEach(d=>b.delete(d.ref));await b.commit();}
+
+// ── CONFIG ──
+function loadCfg(){document.getElementById('cnome').value=CFG.nome||'';document.getElementById('ctel').value=CFG.tel||'';document.getElementById('cext').value=CFG.ext||'';}
+async function saveCfg(){if(!CU)return;CFG.nome=document.getElementById('cnome').value;CFG.tel=document.getElementById('ctel').value;CFG.ext=document.getElementById('cext').value;await db.collection('devedorapp').doc(CU.uid).set({config:CFG},{merge:true});}
+
+// ── BACKUP ──
+function exportData(){const b=new Blob([JSON.stringify({devedores:DVS,lembretes:LMBs,historico:HISTs,config:CFG},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`devedorapp_${hoje()}.json`;a.click();}
+
+// ── TABS / FILTRO / MODAL ──
+function switchTab(n,b){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));if(b)b.classList.add('active');document.getElementById('panel-'+n).classList.add('active');if(n==='cb')popSels();if(n==='ht')renderHist();if(n==='lm')renderLmb();}
+function setFil(f,el){FIL=f;document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderDV();}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+
+// ── INIT ──
+document.getElementById('fdat').value=hoje();
+setInterval(chkLmbs,60000);
+if('serviceWorker' in navigator)navigator.serviceWorker.getRegistrations().then(rs=>Promise.all(rs.map(r=>r.unregister())).then(()=>navigator.serviceWorker.register('./sw.js?v=4').catch(()=>{})));
 </script>
 </body>
 </html>
