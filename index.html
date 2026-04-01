@@ -273,6 +273,7 @@
       <div class="form-group">
         <label>Tom da Mensagem</label>
         <select id="sel-tom" onchange="previewMsg()">
+          <option value="lembrete">🗓️ Lembrete de Vencimento</option>
           <option value="gentil">😊 Gentil / Amigável</option>
           <option value="formal">📋 Formal</option>
           <option value="firme">⚡ Firme</option>
@@ -561,7 +562,7 @@ function verificarLembretesLocal() {
     if (ts <= agora && !l.disparadoLocal) {
       const d = devedores.find(x => x.id === l.devedorId);
       if (!d || d.status === 'pago') continue;
-      const msg = gerarMsg(d, 'gentil');
+      const msg = gerarMsg(d, d.continuo ? 'lembrete' : 'gentil');
       const tel = d.tel ? d.tel.replace(/\D/g, '') : '';
       const wppUrl = tel ? `https://wa.me/55${tel}?text=${encodeURIComponent(msg)}` : '';
       const notif = new Notification(`💰 Cobrar ${d.nome}`, {
@@ -915,9 +916,12 @@ function registrarPagamento() {
 // ════════════════════════════════
 function getAssinatura() {
   let s = '';
-  if (config.nome)  s += `\n\nAtenciosamente,\n*${config.nome}*`;
-  if (config.tel)   s += `\n📞 ${config.tel}`;
-  if (config.extra) s += `\n${config.extra}`;
+  const nome  = (config.nome  || '').replace(/[^\w\sÀ-ÿ]/g, '').trim();
+  const tel   = (config.tel   || '').replace(/[^0-9\s()\-+]/g, '').trim();
+  const extra = (config.extra || '').trim();
+  if (nome)  s += `\n\nAtenciosamente,\n*${nome}*`;
+  if (tel)   s += `\n📞 ${tel}`;
+  if (extra) s += `\n${extra}`;
   return s;
 }
 
@@ -929,7 +933,9 @@ function gerarMsg(d, tom) {
   const pags  = d.pagamentos || [];
   const histP = pags.length ? `\nJá recebemos *${fmtR$(pags.reduce((s,p) => s+p.valor, 0))}* em pagamentos anteriores.` : '';
 
+  const hoje = new Date().toLocaleDateString('pt-BR');
   const msgs = {
+    lembrete: `Olá, *${nome}*! 👋\n\nPassando para lembrar que hoje, *${hoje}*, vence o pagamento${desc ? ' de *' + d.desc + '*' : ''} no valor de *${valor}*.\n\nQualquer dúvida, estou à disposição!${ass}`,
     gentil: `Olá, *${nome}*! 😊\n\nPassando pra lembrar que ainda temos um valor em aberto de *${valor}*${desc}.\n\nQuando puder, me avisa para a gente acertar. Estou à disposição!${histP}${ass}`,
     formal: `Prezado(a) *${nome}*,\n\nInformo que há um saldo pendente de *${valor}*${desc} em seu nome.\n\nSolicito gentilmente que entre em contato para regularização do débito.${histP}${ass}`,
     firme:  `*${nome}*, boa tarde.\n\nHá um débito de *${valor}*${desc} em aberto que precisa ser quitado.\n\nPor favor, providencie o pagamento o quanto antes.${histP}${ass}`,
@@ -1039,9 +1045,9 @@ function loadConfig() {
   document.getElementById('cfg-extra').value = config.extra || '';
 }
 function saveConfig() {
-  config.nome  = document.getElementById('cfg-nome').value;
-  config.tel   = document.getElementById('cfg-tel').value;
-  config.extra = document.getElementById('cfg-extra').value;
+  config.nome  = document.getElementById('cfg-nome').value.trim();
+  config.tel   = document.getElementById('cfg-tel').value.trim();
+  config.extra = document.getElementById('cfg-extra').value.trim();
   save();
 }
 
