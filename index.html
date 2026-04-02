@@ -361,6 +361,10 @@ select option{background:var(--sf);}
 <script>
 firebase.initializeApp({apiKey:"AIzaSyDfl6IJKGWGESwtSEaYw_zYIYLOHYPINzk",authDomain:"meus-gastos-9d631.firebaseapp.com",projectId:"meus-gastos-9d631",storageBucket:"meus-gastos-9d631.firebasestorage.app",messagingSenderId:"1052006244232",appId:"1:1052006244232:web:ecf33d0b872d3c1236243d"});
 const auth=firebase.auth(), db=firebase.firestore();
+
+// Firebase do GastosApp (integração de pagamentos)
+const gastosApp=firebase.initializeApp({apiKey:"AIzaSyDemP1v-FW6hhV1UoHSsJmD6UFtzqS3SnQ",authDomain:"gastos-ee740.firebaseapp.com",projectId:"gastos-ee740",storageBucket:"gastos-ee740.firebasestorage.app",messagingSenderId:"834734384444",appId:"1:834734384444:web:5ea76c41cc0e5b53feaa39"},"gastos");
+const dbGastos=gastosApp.firestore();
 let CU=null, DVS=[], LMBs=[], HISTs=[], CFG={}, FIL='todos', FQ={f:'nao',l:'nao'};
 let uDV,uLM,uHT,uCF;
 
@@ -500,6 +504,7 @@ async function regPag(){
       };
       addH('pay',`${d.nome} — quitou ${R$(rs)} · próxima cobrança: ${fmtD(proxMes)}`);
       toast(`✅ Pago! Próxima cobrança: ${fmtD(proxMes)}`);
+      lancarNoGastos(d, rs);
       // Atualiza lembrete para o próximo mês
       const l=LMBs.find(x=>x.devedorId===id);
       if(l){
@@ -510,6 +515,7 @@ async function regPag(){
       up={status:'pago',valorRestante:0,pagamentos:[...(d.pagamentos||[]),pagReg]};
       addH('pay',`${d.nome} — quitou ${R$(rs)}`);
       toast('✅ Registrado!');
+      lancarNoGastos(d, rs);
       const l=LMBs.find(x=>x.devedorId===id);
       if(l)await col('lembretes').doc(l.id).delete();
     }
@@ -624,6 +630,51 @@ async function saveCfg(){
   CFG.ext=document.getElementById('cext').value.trim();
   delete CFG.extra; // remove chave antiga
   await db.collection('devedorapp').doc(CU.uid).set({config:CFG},{merge:true});
+}
+
+// ── INTEGRAÇÃO GASTOSAPP ──
+async function lancarNoGastos(devedor, valorPago) {
+  if(!CU) return;
+  try {
+    const ref = dbGastos.collection('gastos').doc(CU.uid);
+    const snap = await ref.get();
+    if(!snap.exists) return; // GastosApp não inicializado para este usuário
+
+    const gDB = snap.data();
+    const cats = gDB.categories || [];
+    const txs = gDB.transactions || [];
+
+    // Garante que a categoria "Vendas" existe
+    let catVendas = cats.find(c=>c.name==='Vendas');
+    if(!catVendas){
+      const maxId = Math.max(0, ...cats.map(c=>c.id||0));
+      catVendas = {id: maxId+1, name:'Vendas', color:'#f5a623'};
+      cats.push(catVendas);
+    }
+
+    // Cria a transação
+    const maxTxId = Math.max(0, ...txs.map(t=>t.id||0));
+    const tx = {
+      id: maxTxId + 1,
+      amount: Math.round(valorPago * 100), // em centavos
+      desc: devedor.nome + (devedor.desc ? ' — ' + devedor.desc : ''),
+      date: hoje(),
+      catId: catVendas.id,
+      type: 'ENTRADA',
+      status: 'PAGO',
+      account: 'Nubank',
+      method: '',
+      notes: 'Lançado automaticamente pelo DevedorApp'
+    };
+
+    txs.push(tx);
+    const nextId = Math.max(gDB.nextId||1, tx.id+1);
+    await ref.update({transactions: txs, categories: cats, nextId});
+    toast('💰 Lançado no GastosApp!');
+  } catch(e) {
+    console.warn('GastosApp:', e.message);
+    // Não mostra erro — integração é silenciosa
+  }
 }
 
 // ── REATIVAR ──
