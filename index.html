@@ -441,6 +441,7 @@ function renderDV(){
         ${pgs.length?`<div style="font-size:.72rem;color:var(--t3);margin-bottom:8px;background:var(--bg);padding:7px;border-radius:6px">Pagamentos: ${pgs.map(p=>`<span style="color:var(--gn)">${R$(p.valor)}</span> em ${fmtD(p.data)}`).join(' · ')}</div>`:''}
         <div class="cacts">
           ${d.status!=='pago'?`<button class="bsm ok" onclick="abPag('${d.id}',event)">💵 Pagar</button>`:''}
+          ${d.status==='pago'?`<button class="bsm pu" onclick="reativar('${d.id}',event)">↺ Reativar</button>`:''}
           ${d.tel?`<button class="bsm" onclick="cobWpp('${d.id}',event)">📱 WhatsApp</button>`:''}
           <button class="bsm pu" onclick="abLmb('${d.id}',event)">🔔 ${tL?'Editar':'Lembrete'}</button>
           <button class="bsm" onclick="abEdit('${d.id}',event)">✏️</button>
@@ -623,6 +624,23 @@ async function saveCfg(){
   CFG.ext=document.getElementById('cext').value.trim();
   delete CFG.extra; // remove chave antiga
   await db.collection('devedorapp').doc(CU.uid).set({config:CFG},{merge:true});
+}
+
+// ── REATIVAR ──
+async function reativar(id,e){
+  if(e)e.stopPropagation();
+  const d=DVS.find(x=>x.id===id);
+  if(!d)return;
+  if(!confirm(`Reativar "${d.nome}" como pendente?`))return;
+  try{
+    await col('devedores').doc(id).update({
+      status:'pendente',
+      valorRestante:d.valor,
+      pagamentos:[]
+    });
+    addH('pay',`${d.nome} reativado como pendente`);
+    toast('↺ Reativado!');
+  }catch(e){toast('Erro: '+e.message);}
 }
 
 // ── BACKUP ──
