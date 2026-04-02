@@ -235,6 +235,7 @@ select option{background:var(--sf);}
       <div class="fg"><label>Devedor</label><select id="smsg" onchange="prevMsg()"><option value="">— escolha —</option></select></div>
       <div class="fg"><label>Tom</label>
         <select id="stom" onchange="prevMsg()">
+          <option value="lembrete">🔔 Lembrete de Vencimento</option>
           <option value="gentil">😊 Gentil</option><option value="formal">📋 Formal</option>
           <option value="firme">⚡ Firme</option><option value="ultimo">🚨 Último Aviso</option>
         </select>
@@ -534,7 +535,7 @@ function genMsg(d,tom){
   const val=R$(d.valorRestante??d.valor),ass=getAss(),nm=d.nome.split(' ')[0],desc=d.desc?` referente a *${d.desc}*`:'';
   const histP=(d.pagamentos||[]).length?`
 Já recebemos *${R$((d.pagamentos||[]).reduce((s,p)=>s+p.valor,0))}* em pagamentos anteriores.`:'';
-  return{gentil:`Olá, *${nm}*! 😊
+  return{lembrete:`Olá, *${nm}*! 👋\n\nPassando pra lembrar que hoje vence o pagamento de *${val}*${desc}.\n\nQualquer dúvida, estou à disposição!${ass}`,gentil:`Olá, *${nm}*! 😊
 
 Passando pra lembrar que há um valor em aberto de *${val}*${desc}.
 
@@ -559,7 +560,7 @@ function popSels(){
 function prevMsg(){const id=document.getElementById('smsg').value,tom=document.getElementById('stom').value,w=document.getElementById('mpw');if(!id){w.style.display='none';return;}const d=DVS.find(x=>x.id===id);if(!d)return;document.getElementById('mtxt').textContent=genMsg(d,tom);w.style.display='block';}
 function copyMsg(){navigator.clipboard.writeText(document.getElementById('mtxt').textContent).then(()=>{const b=document.querySelector('.cbtn');b.textContent='✓ Copiado!';setTimeout(()=>b.textContent='Copiar',2000);});}
 function sendWpp(){const id=document.getElementById('smsg').value,msg=document.getElementById('mtxt').textContent;if(!msg)return;const d=DVS.find(x=>x.id===id),tel=d?.tel?d.tel.replace(/\D/g,''):'';window.open(tel?`https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`:`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');addH('msg',`Cobrança: ${d?.nome||'devedor'}`);}
-function cobWpp(id,e){if(e)e.stopPropagation();const d=DVS.find(x=>x.id===id);if(!d)return;const msg=genMsg(d,'gentil'),tel=d.tel?d.tel.replace(/\D/g,''):'';window.open(tel?`https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`:`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');addH('msg',`WhatsApp: ${d.nome}`);}
+function cobWpp(id,e){if(e)e.stopPropagation();const d=DVS.find(x=>x.id===id);if(!d)return;const msg=genMsg(d,d.continuo?'lembrete':'gentil'),tel=d.tel?d.tel.replace(/\D/g,''):'';window.open(tel?`https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`:`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');addH('msg',`WhatsApp: ${d.nome}`);}
 
 // ── HISTÓRICO ──
 function addH(tp,tx){if(!CU)return;col('historico').add({tipo:tp,texto:tx,criadoEm:TS()});}
@@ -567,8 +568,21 @@ function renderHist(){const el=document.getElementById('lht');if(!HISTs.length){
 async function clearHist(){if(!confirm('Limpar?'))return;const s=await col('historico').get();const b=db.batch();s.docs.forEach(d=>b.delete(d.ref));await b.commit();}
 
 // ── CONFIG ──
-function loadCfg(){document.getElementById('cnome').value=CFG.nome||'';document.getElementById('ctel').value=CFG.tel||'';document.getElementById('cext').value=CFG.ext||'';}
-async function saveCfg(){if(!CU)return;CFG.nome=document.getElementById('cnome').value;CFG.tel=document.getElementById('ctel').value;CFG.ext=document.getElementById('cext').value;await db.collection('devedorapp').doc(CU.uid).set({config:CFG},{merge:true});}
+function loadCfg(){
+  // Filtra valores que parecem UUID ou lixo
+  const isUUID = v => /[0-9a-f]{8}-[0-9a-f]{4}/i.test(v||'');
+  document.getElementById('cnome').value=isUUID(CFG.nome)?'':((CFG.nome||'').trim());
+  document.getElementById('ctel').value=((CFG.tel||'').replace(/[^0-9()+\- ]/g,'').trim());
+  document.getElementById('cext').value=isUUID(CFG.ext)?'':((CFG.ext||CFG.extra||'').trim());
+}
+async function saveCfg(){
+  if(!CU)return;
+  CFG.nome=document.getElementById('cnome').value.trim();
+  CFG.tel=document.getElementById('ctel').value.replace(/[^0-9()+\- ]/g,'').trim();
+  CFG.ext=document.getElementById('cext').value.trim();
+  delete CFG.extra; // remove chave antiga
+  await db.collection('devedorapp').doc(CU.uid).set({config:CFG},{merge:true});
+}
 
 // ── BACKUP ──
 function exportData(){const b=new Blob([JSON.stringify({devedores:DVS,lembretes:LMBs,historico:HISTs,config:CFG},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`devedorapp_${hoje()}.json`;a.click();}
