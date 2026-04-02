@@ -478,15 +478,56 @@ async function delDV(id,e){if(e)e.stopPropagation();const d=DVS.find(x=>x.id===i
 }
 
 // ── PAGAMENTO ──
-function abPag(id,e){if(e)e.stopPropagation();const d=DVS.find(x=>x.id===id);if(!d)return;document.getElementById('pagid').value=id;const rs=d.valorRestante??d.valor;document.getElementById('paginfo').innerHTML=`<strong style="color:var(--am)">${d.nome}</strong><br>Em aberto: <strong style="color:var(--rd)">${R$(rs)}</strong>`;document.getElementById('pagtp').value='total';document.getElementById('pagpw').style.display='none';document.getElementById('pagob').value='';openModal('mpag');}
+function abPag(id,e){if(e)e.stopPropagation();const d=DVS.find(x=>x.id===id);if(!d)return;document.getElementById('pagid').value=id;const rs=d.valorRestante??d.valor;const proxMes=proxMesD(d.data||hoje());const aviso=d.continuo?`<div style="margin-top:6px;font-size:.72rem;color:var(--pu);background:var(--pug);border:1px solid rgba(155,114,239,.3);border-radius:6px;padding:5px 8px">↺ Contínuo — próxima cobrança será criada automaticamente para <strong>${fmtD(proxMes)}</strong></div>`:'';document.getElementById('paginfo').innerHTML=`<strong style="color:var(--am)">${d.nome}</strong><br>Em aberto: <strong style="color:var(--rd)">${R$(rs)}</strong>${aviso}`;document.getElementById('pagtp').value='total';document.getElementById('pagpw').style.display='none';document.getElementById('pagob').value='';openModal('mpag');}
 function togPag(){document.getElementById('pagpw').style.display=document.getElementById('pagtp').value==='parcial'?'block':'none';}
 async function regPag(){
   const id=document.getElementById('pagid').value,d=DVS.find(x=>x.id===id);if(!d)return;
   const tp=document.getElementById('pagtp').value,rs=d.valorRestante??d.valor,ob=document.getElementById('pagob').value;
   let up={};
-  if(tp==='total'){up={status:'pago',valorRestante:0,pagamentos:[...(d.pagamentos||[]),{valor:rs,data:hoje(),obs:ob}]};addH('pay',`${d.nome} — quitou ${R$(rs)}`);}
-  else{const vp=parseFloat(document.getElementById('pagvl').value);if(isNaN(vp)||vp<=0){toast('Informe o valor!');return;}const nr=Math.max(0,rs-vp);up={status:nr<=0?'pago':'parcial',valorRestante:nr,pagamentos:[...(d.pagamentos||[]),{valor:vp,data:hoje(),obs:ob}]};addH('pay',`${d.nome} — pagou ${R$(vp)}, resta ${R$(nr)}`);}
-  try{await col('devedores').doc(id).update(up);if(up.status==='pago'){const l=LMBs.find(x=>x.devedorId===id);if(l)await col('lembretes').doc(l.id).delete();}toast('✅ Registrado!');closeModal('mpag');}catch(e){toast('Erro: '+e.message);}
+  if(tp==='total'){
+    // Pagamento total
+    const pagReg={valor:rs,data:hoje(),obs:ob};
+    if(d.continuo){
+      // Contínuo: renova para o próximo mês automaticamente
+      const proxMes=proxMesD(d.data||hoje());
+      up={
+        status:'pendente',
+        valorRestante:d.valor, // restaura valor original
+        data:proxMes,
+        pagamentos:[...(d.pagamentos||[]),pagReg],
+        ultimoPagamento:hoje()
+      };
+      addH('pay',`${d.nome} — quitou ${R$(rs)} · próxima cobrança: ${fmtD(proxMes)}`);
+      toast(`✅ Pago! Próxima cobrança: ${fmtD(proxMes)}`);
+      // Atualiza lembrete para o próximo mês
+      const l=LMBs.find(x=>x.devedorId===id);
+      if(l){
+        const nd=new Date(proxMes+'T12:00:00');
+        await col('lembretes').doc(l.id).update({data:proxMes});
+      }
+    } else {
+      up={status:'pago',valorRestante:0,pagamentos:[...(d.pagamentos||[]),pagReg]};
+      addH('pay',`${d.nome} — quitou ${R$(rs)}`);
+      toast('✅ Registrado!');
+      const l=LMBs.find(x=>x.devedorId===id);
+      if(l)await col('lembretes').doc(l.id).delete();
+    }
+  } else {
+    const vp=parseFloat(document.getElementById('pagvl').value);
+    if(isNaN(vp)||vp<=0){toast('Informe o valor!');return;}
+    const nr=Math.max(0,rs-vp);
+    up={status:nr<=0?'pago':'parcial',valorRestante:nr,pagamentos:[...(d.pagamentos||[]),{valor:vp,data:hoje(),obs:ob}]};
+    addH('pay',`${d.nome} — pagou ${R$(vp)}, resta ${R$(nr)}`);
+    if(nr<=0&&!d.continuo){const l=LMBs.find(x=>x.devedorId===id);if(l)await col('lembretes').doc(l.id).delete();}
+    toast('✅ Registrado!');
+  }
+  try{await col('devedores').doc(id).update(up);closeModal('mpag');}catch(e){toast('Erro: '+e.message);}
+}
+function proxMesD(ds){
+  // Avança 1 mês mantendo o dia
+  const d=new Date((ds||hoje())+'T12:00:00');
+  d.setMonth(d.getMonth()+1);
+  return d.toISOString().split('T')[0];
 }
 
 // ── LEMBRETE ──
