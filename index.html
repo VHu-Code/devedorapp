@@ -372,7 +372,14 @@ select option{background:var(--sf);}
       <button class="btn bghost" style="margin-top:8px;font-size:.78rem" onclick="openModal('mcat')">＋ Nova categoria</button>
     </div>
     <div class="csec"><div class="ctitle">☁️ Conta</div><div id="cinfo" style="font-size:.82rem;color:var(--t2)">...</div></div>
-    <div class="csec"><div class="ctitle">📦 Backup</div><button class="btn bghost" onclick="exportData()">⬇ Exportar JSON</button></div>
+    <div class="csec">
+      <div class="ctitle">📦 Backup</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn bghost" onclick="exportData()">⬇ Exportar JSON</button>
+        <button class="btn bghost" style="color:var(--pu);border-color:rgba(155,114,239,.4)" onclick="importarGastos()">⬆ Importar do GastosApp</button>
+      </div>
+      <div id="import-status" style="margin-top:10px;font-size:.78rem;color:var(--t2)"></div>
+    </div>
   </div>
 </main>
 
@@ -547,6 +554,17 @@ firebase.initializeApp({
   appId:"1:1052006244232:web:ecf33d0b872d3c1236243d"
 });
 const auth=firebase.auth(), db=firebase.firestore();
+
+// Firebase do GastosApp (para importação de dados)
+const gastosApp = firebase.initializeApp({
+  apiKey:"AIzaSyDemP1v-FW6hhV1UoHSsJmD6UFtzqS3SnQ",
+  authDomain:"gastos-ee740.firebaseapp.com",
+  projectId:"gastos-ee740",
+  storageBucket:"gastos-ee740.firebasestorage.app",
+  messagingSenderId:"834734384444",
+  appId:"1:834734384444:web:5ea76c41cc0e5b53feaa39"
+}, "gastos");
+const dbGastos = gastosApp.firestore();
 
 // ── ESTADO GLOBAL ──
 let CU=null, DVS=[], LMBs=[], HISTs=[], CFG={}, FIL='todos', FQ={f:'nao',l:'nao'};
@@ -936,6 +954,112 @@ async function saveCfg(){
   CFG.tel=document.getElementById('ctel').value.replace(/[^0-9()+\- ]/g,'').trim();
   CFG.ext=document.getElementById('cext').value.trim();
   await db.collection('devedorapp').doc(CU.uid).set({config:CFG},{merge:true});
+}
+
+// ── IMPORTAR DO GASTOSAPP ──
+async function importarGastos(){
+  const status = document.getElementById('import-status');
+  if(!CU){ toast('Faça login primeiro!'); return; }
+  if(!confirm('Isso vai importar TODAS as transações, contas e categorias do GastosApp para cá. Continuar?')) return;
+
+  status.textContent = '⏳ Conectando ao GastosApp...';
+  status.style.color = 'var(--am)';
+
+  try {
+    // Tenta autenticar no projeto GastosApp com o mesmo Google login
+    const gastosAuth = gastosApp.auth();
+    let gastosUser = gastosAuth.currentUser;
+
+    if(!gastosUser){
+      status.textContent = '🔑 Autenticando no GastosApp...';
+      // Usa popup para logar no projeto gastos com a mesma conta
+      const provider = new firebase.auth.GoogleAuthProvider();
+      const result = await gastosAuth.signInWithPopup(provider);
+      gastosUser = result.user;
+    }
+
+    status.textContent = '📥 Lendo seus dados...';
+    const snap = await dbGastos.collection('gastos').doc(gastosUser.uid).get();
+
+    if(!snap.exists){
+      status.textContent = '❌ Nenhum dado encontrado no GastosApp.';
+      status.style.color = 'var(--rd)';
+      return;
+    }
+
+    const dados = snap.data();
+    const txs = dados.transactions || [];
+    const cats = dados.categories || [];
+    const accts = dados.accounts || [];
+
+    status.textContent = `📊 Encontrado: ${txs.length} transações, ${cats.length} categorias, ${accts.length} contas. Importando...`;
+
+    // Mescla categorias (evita duplicatas por nome)
+    let maxCatId = Math.max(0, ...FIN.categories.map(c=>c.id));
+    const catMap = {}; // id antigo → novo id
+    cats.forEach(c => {
+      const existe = FIN.categories.find(x=>x.name.toLowerCase()===c.name.toLowerCase());
+      if(existe){
+        catMap[c.id] = existe.id;
+      } else {
+        maxCatId++;
+        catMap[c.id] = maxCatId;
+        FIN.categories.push({id:maxCatId, name:c.name, color:c.color||'#adb5bd'});
+      }
+    });
+
+    // Mescla contas (evita duplicatas por nome)
+    let maxAccId = Math.max(0, ...FIN.accounts.map(a=>a.id));
+    accts.forEach(a => {
+      const existe = FIN.accounts.find(x=>x.name.toLowerCase()===a.name.toLowerCase());
+      if(!existe){
+        maxAccId++;
+        FIN.accounts.push({id:maxAccId, name:a.name, icon:a.icon||'💳', color:a.color||'#adb5bd', initialBalance:a.initialBalance||0});
+      }
+    });
+
+    // Importa transações (evita duplicatas por data+desc+valor)
+    let maxTxId = Math.max(0, ...FIN.transactions.map(t=>t.id||0));
+    let importadas = 0;
+    txs.forEach(t => {
+      // Verifica se já existe transação igual
+      const existe = FIN.transactions.find(x=>
+        x.date===t.date &&
+        Math.abs(x.amount - t.amount) < 1 &&
+        (x.desc||'').toLowerCase() === (t.desc||'').toLowerCase()
+      );
+      if(!existe){
+        maxTxId++;
+        FIN.transactions.push({
+          id: maxTxId,
+          amount: t.amount,       // GastosApp usa centavos? Verificar
+          desc: t.desc || '',
+          date: t.date || '',
+          catId: catMap[t.catId] || FIN.categories[FIN.categories.length-1]?.id || 1,
+          type: t.type || 'SAIDA',
+          account: t.account || '',
+          notes: t.notes || ''
+        });
+        importadas++;
+      }
+    });
+
+    FIN.nextId = maxTxId + 1;
+    await persistFin();
+
+    status.textContent = `✅ Importado! ${importadas} transações, ${Object.keys(catMap).length} categorias, ${accts.length} contas.`;
+    status.style.color = 'var(--gn)';
+    toast(`✅ ${importadas} transações importadas!`);
+    renderFin();
+    renderTx();
+    renderCfgFin();
+
+  } catch(e) {
+    console.error(e);
+    status.textContent = '❌ Erro: ' + e.message;
+    status.style.color = 'var(--rd)';
+    toast('Erro ao importar: ' + e.message);
+  }
 }
 
 // ── BACKUP ──
