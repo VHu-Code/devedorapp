@@ -423,22 +423,25 @@ Entrar com Google
 <div class="fg"><label>Pix / Info extra</label><input type="text" id="cext" placeholder="Pix: 000.000.000-00" oninput="saveCfg()"></div>
 </div>
 <div class="csec">
-<div class="ctitle">💳 Contas Financeiras</div>
-<div id="cf-contas"></div>
-<button class="btn bghost" style="margin-top:8px;font-size:.78rem" onclick="openModal('macc')">＋ Nova conta</button>
-</div>
-<div class="csec">
 <div class="ctitle">🏷️ Categorias</div>
 <div id="cf-cats"></div>
 <button class="btn bghost" style="margin-top:8px;font-size:.78rem" onclick="openModal('mcat')">＋ Nova categoria</button>
 </div>
 <div class="csec"><div class="ctitle">☁️ Conta</div><div id="cinfo" style="font-size:.82rem;color:var(--t2)">...</div></div>
 <div class="csec">
-<div class="ctitle">📦 Backup</div>
+<div class="ctitle">📋 Mais</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<button class="btn bghost" onclick="goTab('lm',null);document.querySelectorAll('.bntab').forEach(b=>b.classList.remove('active'))">🔔 Lembretes</button>
+<button class="btn bghost" onclick="goTab('ht',null);document.querySelectorAll('.bntab').forEach(b=>b.classList.remove('active'))">📋 Histórico</button>
+</div>
+</div>
+<div class="csec">
+<div class="ctitle">📦 Backup & Dados</div>
 <div style="display:flex;gap:8px;flex-wrap:wrap">
 <button class="btn bghost" onclick="exportData()">⬇ Exportar JSON</button>
 <button class="btn bghost" style="color:var(--pu);border-color:rgba(155,114,239,.4)" onclick="importarGastos()">⬆ Importar do GastosApp</button>
-<button class="btn bghost" style="color:var(--rd);border-color:rgba(224,90,90,.4)" onclick="limparFinancas()">🗑️ Limpar dados financeiros</button>
+<button class="btn bghost" style="color:var(--rd);border-color:rgba(224,90,90,.4)" onclick="limparMes()">🗑️ Limpar entradas do mês</button>
+<button class="btn bghost" style="color:var(--rd);border-color:rgba(224,90,90,.4)" onclick="limparTudo()">⚠️ Limpar tudo</button>
 </div>
 <div id="import-status" style="margin-top:10px;font-size:.78rem;color:var(--t2)"></div>
 </div>
@@ -549,26 +552,6 @@ Entrar com Google
 <div class="mfooter"><button class="btn bghost" onclick="closeModal('mlmb')">Cancelar</button><button class="btn bprim" onclick="saveLmb()">Salvar</button></div>
 </div></div>
 
-<!-- MODAL: CONTA -->
-<div class="overlay" id="macc">
-<div class="modal"><div class="mhandle"></div><div class="mtitle">Nova <span>Conta</span></div>
-<input type="hidden" id="acc-id">
-<div class="fg"><label>Nome</label><input type="text" id="acc-name" placeholder="Ex: Nubank, Carteira..."></div>
-<div class="fg"><label>Ícone</label>
-<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px" id="acc-icons">
-<span style="cursor:pointer;font-size:1.4rem" onclick="selAccIco(this,'👛')">👛</span>
-<span style="cursor:pointer;font-size:1.4rem" onclick="selAccIco(this,'💳')">💳</span>
-<span style="cursor:pointer;font-size:1.4rem" onclick="selAccIco(this,'🏦')">🏦</span>
-<span style="cursor:pointer;font-size:1.4rem" onclick="selAccIco(this,'📱')">📱</span>
-<span style="cursor:pointer;font-size:1.4rem" onclick="selAccIco(this,'💵')">💵</span>
-<span style="cursor:pointer;font-size:1.4rem" onclick="selAccIco(this,'🏧')">🏧</span>
-<span style="cursor:pointer;font-size:1.4rem" onclick="selAccIco(this,'🐖')">🐖</span>
-<span style="cursor:pointer;font-size:1.4rem" onclick="selAccIco(this,'📊')">📊</span>
-</div></div>
-<div class="fg"><label>Saldo Inicial (R$)</label><input type="number" id="acc-bal" value="0" step="0.01"></div>
-<div class="mfooter"><button class="btn bghost" onclick="closeModal('macc')">Cancelar</button><button class="btn bprim" onclick="saveAcc()">Salvar</button></div>
-</div></div>
-
 <!-- MODAL: CATEGORIA -->
 <div class="overlay" id="mcat">
 <div class="modal"><div class="mhandle"></div><div class="mtitle">Nova <span>Categoria</span></div>
@@ -624,7 +607,7 @@ Entrar com Google
 <option value="poupanca">🐖 Poupança</option>
 <option value="cartao">💳 Cartão de Crédito</option>
 <option value="investimento">📊 Investimento</option>
-<option value="digital">📱 Conta Digital</option>
+
 </select></div>
 <div class="fr">
 <div class="fg"><label>Saldo Atual (R$)</label><input type="number" id="bk-saldo-input" placeholder="0,00" step="0.01"></div>
@@ -659,7 +642,7 @@ const dbGastos=gastosApp.firestore();
 // ── ESTADO GLOBAL ──
 let CU=null,DVS=[],LMBs=[],HISTs=[],CFG={},FIL='todos',FQ={f:'nao',l:'nao'};
 let uDV,uLM,uHT,uCF,uFIN;
-let FDAT={},txFil='TODAS',txType='SAIDA',selAccIco_='👛',selCatCor_='#f5a623';
+let FDAT={},txFil='TODAS',txType='SAIDA',selCatCor_='#f5a623';
 let pieChart=null,mesFin=nowYM();
 let BANKS=[],uBK=null,selBkCor_='#9b72ef',creditChart=null;
 
@@ -669,7 +652,7 @@ function blankFin(){return{transactions:[],categories:[...DEF_CATS],accounts:[..
 let FIN=blankFin();
 
 const BANK_ICONS={'Nubank':'💜','Inter':'🟠','C6 Bank':'⚫','PicPay':'🟢','Mercado Pago':'🔵','Itaú':'🟠','Bradesco':'🔴','Banco do Brasil':'🟡','Caixa':'🔵','Santander':'🔴','Sicoob':'🟢','Sicredi':'🟢','Neon':'🔵','PagBank':'🟡','Will Bank':'🟣','Next':'🟢','BTG Pactual':'⚫'};
-const TIPO_LABELS={'corrente':'Conta Corrente','poupanca':'Poupança','cartao':'Cartão de Crédito','investimento':'Investimento','digital':'Conta Digital'};
+const TIPO_LABELS={'corrente':'Conta Corrente','poupanca':'Poupança','cartao':'Cartão de Crédito','investimento':'Investimento'};
 
 // ── AUTH ──
 auth.onAuthStateChanged(u=>{if(u){CU=u;document.getElementById('ls').style.display='none';updateUI(u);startL();}else{CU=null;document.getElementById('ls').style.display='flex';stopL();setSd('load');}});
@@ -763,8 +746,9 @@ function lancarFinanceiro(desc,valor,tipo){
 // 1. Lança na aba Finanças
 let catVendas=FIN.categories.find(c=>c.name==='Vendas');
 if(!catVendas){const maxId=Math.max(0,...FIN.categories.map(c=>c.id));catVendas={id:maxId+1,name:'Vendas',color:'#f5a623'};FIN.categories.push(catVendas);}
-const accNubank=FIN.accounts.find(a=>a.name==='Nubank');
-const acc=accNubank?accNubank.name:(FIN.accounts[0]?.name||'Nubank');
+// Busca conta: primeiro nos Bancos cadastrados, depois fallback
+const bancoNubank=BANKS.find(b=>b.nome==='Nubank');
+const acc=bancoNubank?bancoNubank.nome:(BANKS[0]?.nome||FIN.accounts[0]?.name||'Nubank');
 const tx={id:FIN.nextId++,amount:valor,desc,date:hoje(),catId:catVendas.id,type:tipo,account:acc,notes:'Lançado automaticamente (DevedorApp)'};
 FIN.transactions.push(tx);persistFin();
 
@@ -875,7 +859,7 @@ elDev.innerHTML=`<div style="display:flex;justify-content:space-between;padding:
 let txFil_='TODAS';
 function setTxFil(f,el){txFil_=f;document.querySelectorAll('#s-tx .chip').forEach(c=>c.classList.remove('active'));if(el)el.classList.add('active');renderTx();}
 function renderTx(){const q=(document.getElementById('search-tx')?.value||'').toLowerCase();let txs=[...FIN.transactions].sort((a,b)=>(b.date||'').localeCompare(a.date||''));if(txFil_==='ENTRADA')txs=txs.filter(t=>t.type==='ENTRADA');if(txFil_==='SAIDA')txs=txs.filter(t=>t.type==='SAIDA');if(q)txs=txs.filter(t=>(t.desc||'').toLowerCase().includes(q));const el=document.getElementById('ltx');if(!txs.length){el.innerHTML='<div class="empty"><div class="empty-icon">💳</div><p>Nenhuma transação.<br>Toque em ＋ para adicionar.</p></div>';return;}el.innerHTML=txs.map(t=>{const cat=getCat(t.catId);return`<div class="txitem" onclick="editTx(${t.id})"><div class="txcat-dot" style="background:${cat.color}"></div><div class="txinfo"><div class="txdesc">${t.desc||'Sem descrição'}</div><div class="txmeta">${fmtD(t.date)} · ${cat.name}${t.account?' · '+t.account:''}</div></div><div class="txval ${t.type==='ENTRADA'?'entrada':'saida'}">${t.type==='ENTRADA'?'+':'-'}${R$(t.amount)}</div></div>`;}).join('');}
-function popTxForm(){document.getElementById('tx-id').value='';document.getElementById('tx-desc').value='';document.getElementById('tx-val').value='';document.getElementById('tx-date').value=hoje();setTxType('SAIDA');document.getElementById('tx-cat').innerHTML=FIN.categories.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');document.getElementById('tx-acc').innerHTML=FIN.accounts.map(a=>`<option value="${a.name}">${a.icon} ${a.name}</option>`).join('');}
+function popTxForm(){document.getElementById('tx-id').value='';document.getElementById('tx-desc').value='';document.getElementById('tx-val').value='';document.getElementById('tx-date').value=hoje();setTxType('SAIDA');document.getElementById('tx-cat').innerHTML=FIN.categories.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');const accOpts=BANKS.length?BANKS.map(b=>`<option value="${b.nome}">${b.icon||'🏦'} ${b.nome}</option>`).join(''):FIN.accounts.map(a=>`<option value="${a.name}">${a.icon} ${a.name}</option>`).join('');document.getElementById('tx-acc').innerHTML=accOpts;}
 function setTxType(tp){txType=tp;document.getElementById('tbtn-saida').className='tbtn'+(tp==='SAIDA'?' active-saida':'');document.getElementById('tbtn-entrada').className='tbtn'+(tp==='ENTRADA'?' active-entrada':'');}
 async function saveTx(){const vl=parseFloat(document.getElementById('tx-val').value);const desc=document.getElementById('tx-desc').value.trim();if(!desc||isNaN(vl)||vl<=0){toast('Preencha descrição e valor!');return;}const id=document.getElementById('tx-id').value;const accName=document.getElementById('tx-acc').value;const tx={id:id?parseInt(id):FIN.nextId++,amount:vl,desc,date:document.getElementById('tx-date').value,catId:parseInt(document.getElementById('tx-cat').value),type:txType,account:accName,notes:''};
 if(id){
@@ -889,7 +873,7 @@ await persistFin();
 const bancoAlvo=BANKS.find(b=>b.nome.toLowerCase()===accName.toLowerCase());
 if(bancoAlvo){const novoSaldo=txType==='ENTRADA'?(bancoAlvo.saldo||0)+vl:(bancoAlvo.saldo||0)-vl;col('bancos').doc(bancoAlvo.id).update({saldo:novoSaldo,atualizadoEm:TS()}).catch(()=>{});}
 toast(id?'✅ Atualizado!':'✅ Salvo!');closeModal('mtx');}
-function editTx(id){const t=FIN.transactions.find(x=>x.id===id);if(!t)return;document.getElementById('tx-id').value=id;setTxType(t.type);document.getElementById('tx-desc').value=t.desc||'';document.getElementById('tx-val').value=t.amount;document.getElementById('tx-date').value=t.date||hoje();document.getElementById('tx-cat').innerHTML=FIN.categories.map(c=>`<option value="${c.id}" ${c.id===t.catId?'selected':''}>${c.name}</option>`).join('');document.getElementById('tx-acc').innerHTML=FIN.accounts.map(a=>`<option value="${a.name}" ${a.name===t.account?'selected':''}>${a.icon} ${a.name}</option>`).join('');openModal('mtx');}
+function editTx(id){const t=FIN.transactions.find(x=>x.id===id);if(!t)return;document.getElementById('tx-id').value=id;setTxType(t.type);document.getElementById('tx-desc').value=t.desc||'';document.getElementById('tx-val').value=t.amount;document.getElementById('tx-date').value=t.date||hoje();document.getElementById('tx-cat').innerHTML=FIN.categories.map(c=>`<option value="${c.id}" ${c.id===t.catId?'selected':''}>${c.name}</option>`).join('');const accOpts=BANKS.length?BANKS.map(b=>`<option value="${b.nome}" ${b.nome===t.account?'selected':''}>${b.icon||'🏦'} ${b.nome}</option>`).join(''):FIN.accounts.map(a=>`<option value="${a.name}" ${a.name===t.account?'selected':''}>${a.icon} ${a.name}</option>`).join('');document.getElementById('tx-acc').innerHTML=accOpts;openModal('mtx');}
 async function delTx(id){FIN.transactions=FIN.transactions.filter(t=>t.id!==id);await persistFin();toast('Removido');}
 
 // ── CONFIG ──
@@ -897,10 +881,7 @@ function saveCfg(){CFG={nome:document.getElementById('cnome').value,tel:document
 function loadCfg(){document.getElementById('cnome').value=CFG.nome||'';document.getElementById('ctel').value=CFG.tel||'';document.getElementById('cext').value=CFG.ext||'';}
 
 // ── CONFIG FINANCEIRO ──
-function renderCfgFin(){const elC=document.getElementById('cf-contas');elC.innerHTML=(FIN.accounts||[]).map(a=>{const bal=calcBal(a);return`<div class="accard"><div class="acico" style="background:${a.color}22">${a.icon}</div><div class="acinfo"><div class="acname">${a.name}</div><div class="acbal" style="color:${bal>=0?'var(--gn)':'var(--rd)'}">${R$(bal)}</div></div><button class="bsm danger" onclick="delAcc('${a.name}')">🗑️</button></div>`;}).join('');const elCats=document.getElementById('cf-cats');elCats.innerHTML=(FIN.categories||[]).map(c=>{const total=FIN.transactions.filter(t=>t.catId===c.id).reduce((s,t)=>s+(t.type==='SAIDA'?t.amount:0),0);return`<div class="catrow"><div class="catdot" style="background:${c.color}"></div><div class="catname">${c.name}</div><div class="catval">${R$(total)}</div><button class="bsm danger" style="margin-left:6px" onclick="delCat(${c.id})">🗑️</button></div>`;}).join('');}
-function selAccIco(el,ico){selAccIco_=ico;document.querySelectorAll('#acc-icons span').forEach(s=>s.style.outline='none');el.style.outline='2px solid var(--am)';el.style.borderRadius='6px';}
-async function saveAcc(){const name=document.getElementById('acc-name').value.trim();if(!name){toast('Nome!');return;}const bal=parseFloat(document.getElementById('acc-bal').value)||0;FIN.accounts.push({id:Math.max(0,...FIN.accounts.map(a=>a.id||0))+1,name,icon:selAccIco_,color:'#f5a623',initialBalance:bal});await persistFin();toast('✅ Conta salva!');closeModal('macc');document.getElementById('acc-name').value='';document.getElementById('acc-bal').value='0';}
-async function delAcc(name){if(!confirm(`Remover conta "${name}"?`))return;FIN.accounts=FIN.accounts.filter(a=>a.name!==name);await persistFin();}
+function renderCfgFin(){const elCats=document.getElementById('cf-cats');elCats.innerHTML=(FIN.categories||[]).map(c=>{const total=FIN.transactions.filter(t=>t.catId===c.id).reduce((s,t)=>s+(t.type==='SAIDA'?t.amount:0),0);return`<div class="catrow"><div class="catdot" style="background:${c.color}"></div><div class="catname">${c.name}</div><div class="catval">${R$(total)}</div><button class="bsm danger" style="margin-left:6px" onclick="delCat(${c.id})">🗑️</button></div>`;}).join('');}
 function selCatCor(el,cor){selCatCor_=cor;document.querySelectorAll('#cat-colors .cdot').forEach(d=>d.classList.remove('sel'));el.classList.add('sel');}
 async function saveCat(){const name=document.getElementById('cat-name').value.trim();if(!name){toast('Nome!');return;}FIN.categories.push({id:Math.max(0,...FIN.categories.map(c=>c.id))+1,name,color:selCatCor_});await persistFin();toast('✅ Categoria salva!');closeModal('mcat');document.getElementById('cat-name').value='';}
 async function delCat(id){if(!confirm('Remover categoria?'))return;FIN.categories=FIN.categories.filter(c=>c.id!==id);await persistFin();}
@@ -925,14 +906,60 @@ status.innerHTML=`<span style="color:var(--gn)">✅ Importação concluída! ${i
 }catch(e){status.textContent='Erro: '+e.message;}
 }
 
-async function limparFinancas(){if(!confirm('⚠️ Limpar TODOS os dados financeiros (transações, contas, categorias)?\n\nEsta ação não pode ser desfeita!'))return;if(!confirm('TEM CERTEZA? Todos os dados financeiros serão apagados.'))return;FIN=blankFin();await persistFin();toast('🗑️ Dados financeiros limpos');}
+async function limparMes(){
+const mesAtual=nowYM();
+const mesNome=mesLabel(mesAtual);
+if(!confirm(`⚠️ Limpar todas as entradas de ${mesNome}?\n\n• Pagamentos de devedores deste mês serão removidos\n• Transações financeiras deste mês serão removidas\n• Devedores pagos este mês voltarão a pendente\n\nEsta ação não pode ser desfeita!`))return;
+
+// 1. Limpar transações do mês atual
+FIN.transactions=FIN.transactions.filter(t=>!(t.date||'').startsWith(mesAtual));
+await persistFin();
+
+// 2. Limpar pagamentos do mês nos devedores
+const batch=db.batch();
+DVS.forEach(d=>{
+const pgsMes=(d.pagamentos||[]).filter(p=>(p.data||'').startsWith(mesAtual));
+if(pgsMes.length){
+const pgsRestantes=(d.pagamentos||[]).filter(p=>!(p.data||'').startsWith(mesAtual));
+const valorDevolvido=pgsMes.reduce((s,p)=>s+p.valor,0);
+const novoRestante=(d.valorRestante??0)+valorDevolvido;
+const novoStatus=pgsRestantes.length?'parcial':'pendente';
+batch.update(col('devedores').doc(d.id),{pagamentos:pgsRestantes,valorRestante:Math.min(novoRestante,d.valor),status:novoStatus});
+}
+});
+await batch.commit();
+addH('pay',`Entradas de ${mesNome} limpas`);
+toast(`🗑️ Entradas de ${mesNome} limpas`);
+}
+
+async function limparTudo(){
+if(!confirm('⚠️ ATENÇÃO: Limpar TODOS os dados?\n\n• Todos os devedores\n• Todas as transações\n• Todos os bancos\n• Todo o histórico\n\nEsta ação NÃO pode ser desfeita!'))return;
+if(!confirm('TEM CERTEZA ABSOLUTA? Tudo será apagado permanentemente.'))return;
+
+// Limpar transações
+FIN=blankFin();await persistFin();
+
+// Limpar devedores
+const dvs=await col('devedores').get();const b1=db.batch();dvs.docs.forEach(d=>b1.delete(d.ref));await b1.commit();
+
+// Limpar bancos
+const bks=await col('bancos').get();const b2=db.batch();bks.docs.forEach(d=>b2.delete(d.ref));await b2.commit();
+
+// Limpar lembretes
+const lms=await col('lembretes').get();const b3=db.batch();lms.docs.forEach(d=>b3.delete(d.ref));await b3.commit();
+
+// Limpar histórico
+const hts=await col('historico').get();const b4=db.batch();hts.docs.forEach(d=>b4.delete(d.ref));await b4.commit();
+
+toast('🗑️ Todos os dados foram limpos');
+}
 
 // ══════════════════════════════════════════════════════════════
 // OPEN FINANCE — MEUS BANCOS
 // ══════════════════════════════════════════════════════════════
 
 function bkBancoChange(){document.getElementById('bk-custom-wrap').style.display=document.getElementById('bk-banco').value==='Outro'?'block':'none';}
-function bkTipoChange(){const tipo=document.getElementById('bk-tipo').value;const isCartao=tipo==='cartao';document.getElementById('bk-limite-wrap').style.display=(isCartao||tipo==='corrente'||tipo==='digital')?'block':'none';document.getElementById('bk-fatura-wrap').style.display=isCartao?'block':'none';if(!isCartao)document.getElementById('bk-fatura-input').value='';}
+function bkTipoChange(){const tipo=document.getElementById('bk-tipo').value;const isCartao=tipo==='cartao';document.getElementById('bk-limite-wrap').style.display=(isCartao||tipo==='corrente')?'block':'none';document.getElementById('bk-fatura-wrap').style.display=isCartao?'block':'none';if(!isCartao)document.getElementById('bk-fatura-input').value='';}
 function selBkCor(el,cor){document.querySelectorAll('#bk-colors .cdot').forEach(d=>d.classList.remove('sel'));el.classList.add('sel');selBkCor_=cor;}
 
 function resetBankForm(){document.getElementById('bk-id').value='';document.getElementById('bk-banco').value='';document.getElementById('bk-custom-name').value='';document.getElementById('bk-custom-wrap').style.display='none';document.getElementById('bk-tipo').value='corrente';document.getElementById('bk-saldo-input').value='';document.getElementById('bk-limite-input').value='';document.getElementById('bk-fatura-input').value='';document.getElementById('bk-obs').value='';document.getElementById('bk-limite-wrap').style.display='block';document.getElementById('bk-fatura-wrap').style.display='none';selBkCor_='#9b72ef';document.querySelectorAll('#bk-colors .cdot').forEach(d=>d.classList.remove('sel'));document.querySelector('#bk-colors .cdot').classList.add('sel');document.getElementById('mbank-title-text').textContent='Novo Banco';}
