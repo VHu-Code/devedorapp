@@ -377,6 +377,7 @@ select option{background:var(--sf);}
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn bghost" onclick="exportData()">⬇ Exportar JSON</button>
         <button class="btn bghost" style="color:var(--pu);border-color:rgba(155,114,239,.4)" onclick="importarGastos()">⬆ Importar do GastosApp</button>
+        <button class="btn bghost" style="color:var(--rd);border-color:rgba(224,90,90,.4)" onclick="limparFinancas()">🗑️ Limpar dados financeiros</button>
       </div>
       <div id="import-status" style="margin-top:10px;font-size:.78rem;color:var(--t2)"></div>
     </div>
@@ -954,6 +955,19 @@ async function saveCfg(){
   CFG.tel=document.getElementById('ctel').value.replace(/[^0-9()+\- ]/g,'').trim();
   CFG.ext=document.getElementById('cext').value.trim();
   await db.collection('devedorapp').doc(CU.uid).set({config:CFG},{merge:true});
+}
+
+// ── LIMPAR DADOS FINANCEIROS ──
+async function limparFinancas(){
+  if(!confirm('Isso vai apagar TODAS as transações, contas e categorias financeiras. Os devedores não serão afetados. Tem certeza?')) return;
+  if(!confirm('Confirma? Esta ação não pode ser desfeita.')) return;
+  FIN = blankFin();
+  await persistFin();
+  toast('🗑️ Dados financeiros apagados!');
+  renderFin();
+  renderTx();
+  renderCfgFin();
+  document.getElementById('import-status').textContent = '';
 }
 
 // ── IMPORTAR DO GASTOSAPP ──
