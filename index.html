@@ -761,7 +761,12 @@ async function regPag(){
     toast('✅ Registrado!');
     lancarFinanceiro(d.nome+(d.desc?' — '+d.desc:''), vp, 'ENTRADA');
   }
-  try{await col('devedores').doc(id).update(up);closeModal('mpag');}catch(e){toast('Erro: '+e.message);}
+  try{
+    await col('devedores').doc(id).update(up);
+    closeModal('mpag');
+    // Navega para aba Finanças para ver o lançamento
+    setTimeout(()=>goTab('fin', document.getElementById('nav-fin')), 400);
+  }catch(e){toast('Erro: '+e.message);}
 }
 function proxMesD(ds){const d=new Date((ds||hoje())+'T12:00:00');d.setMonth(d.getMonth()+1);return d.toISOString().split('T')[0];}
 
