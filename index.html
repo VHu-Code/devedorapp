@@ -241,6 +241,21 @@ select option{background:var(--sf);}
 .fq-bank-bar{width:60px;height:4px;background:var(--bd);border-radius:2px;margin-top:3px;margin-left:auto;}
 .fq-bank-bar-fill{height:100%;border-radius:2px;}
 
+/* ── PLUGGY CONNECT ── */
+.pluggy-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.btn-pluggy{background:linear-gradient(135deg,#5b8def,#9b72ef);color:#fff;border:none;padding:10px 18px;border-radius:var(--rs);font-size:.82rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-family:"DM Sans",sans-serif;transition:all .2s;box-shadow:0 4px 16px rgba(91,141,239,.3);}
+.btn-pluggy:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(91,141,239,.4);}
+.btn-pluggy:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.btn-sync{background:transparent;border:1px solid var(--bd2);color:var(--t2);padding:10px 14px;border-radius:var(--rs);font-size:.82rem;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:"DM Sans",sans-serif;transition:.15s;}
+.btn-sync:hover{color:var(--t1);border-color:var(--amd);}
+.btn-sync:disabled{opacity:.5;cursor:not-allowed;}
+.pluggy-badge{display:inline-flex;align-items:center;gap:4px;font-size:.6rem;padding:2px 7px;border-radius:20px;font-weight:500;}
+.pluggy-badge.connected{background:var(--gng);color:var(--gn);border:1px solid rgba(76,175,130,.3);}
+.pluggy-badge.syncing{background:var(--amg);color:var(--am);border:1px solid rgba(245,166,35,.3);animation:pulse 1s infinite;}
+.pluggy-badge.error{background:var(--rdg);color:var(--rd);border:1px solid rgba(224,90,90,.3);}
+.bank-pluggy-info{font-size:.65rem;color:var(--t3);margin-top:4px;display:flex;align-items:center;gap:4px;}
+.pluggy-sync-time{font-family:"DM Mono",monospace;font-size:.62rem;color:var(--t3);}
+
 @media(max-width:480px){.stats{grid-template-columns:1fr 1fr;}.sc:last-child{grid-column:span 2;}.fr{grid-template-columns:1fr;}}
 </style>
 </head>
@@ -300,8 +315,8 @@ Entrar com Google
 <!-- ABA BANCOS / OPEN FINANCE -->
 <div class="screen" id="s-bk">
 <div class="bank-hero">
-<div class="bank-hero-title">🏦 Open Finance</div>
-<div class="bank-hero-sub">Visão consolidada de todos os seus bancos, saldos e limites de crédito.</div>
+<div class="bank-hero-title">🏦 Open Finance <span class="pluggy-badge connected" id="pluggy-status" style="display:none">● Conectado</span></div>
+<div class="bank-hero-sub">Conecte seus bancos via Open Finance (Pluggy) para sincronizar saldos, limites e faturas automaticamente.</div>
 </div>
 <div class="patrimonio-card">
 <div class="patrimonio-label">Patrimônio Total</div>
@@ -319,8 +334,12 @@ Entrar com Google
 </div>
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
 <div style="font-family:Syne,sans-serif;font-weight:700;font-size:.92rem;color:var(--t1)">Meus Bancos</div>
-<button class="btn bprim" style="font-size:.74rem;padding:6px 12px" onclick="resetBankForm();openModal('mbank')">＋ Banco</button>
+<div class="pluggy-actions">
+<button class="btn-sync" onclick="pluggySyncAll()" id="btn-sync-banks">🔄 Sincronizar</button>
+<button class="btn-pluggy" onclick="connectBank()" id="btn-connect-bank">🔗 Conectar Banco</button>
 </div>
+</div>
+<div id="pluggy-sync-info" style="font-size:.7rem;color:var(--t3);margin-bottom:10px;display:none"></div>
 <div id="lbanks"></div>
 </div>
 
@@ -573,62 +592,7 @@ Entrar com Google
 <div class="mfooter"><button class="btn bghost" onclick="closeModal('mcat')">Cancelar</button><button class="btn bprim" onclick="saveCat()">Salvar</button></div>
 </div></div>
 
-<!-- MODAL: NOVO BANCO -->
-<div class="overlay" id="mbank">
-<div class="modal"><div class="mhandle"></div>
-<div class="mtitle">🏦 <span id="mbank-title-text">Novo Banco</span></div>
-<input type="hidden" id="bk-id">
-<div class="fg"><label>Banco</label>
-<select id="bk-banco" onchange="bkBancoChange()">
-<option value="">— selecione —</option>
-<option value="Nubank">💜 Nubank</option>
-<option value="Inter">🟠 Inter</option>
-<option value="C6 Bank">⚫ C6 Bank</option>
-<option value="PicPay">🟢 PicPay</option>
-<option value="Mercado Pago">🔵 Mercado Pago</option>
-<option value="Itaú">🟠 Itaú</option>
-<option value="Bradesco">🔴 Bradesco</option>
-<option value="Banco do Brasil">🟡 Banco do Brasil</option>
-<option value="Caixa">🔵 Caixa</option>
-<option value="Santander">🔴 Santander</option>
-<option value="Sicoob">🟢 Sicoob</option>
-<option value="Sicredi">🟢 Sicredi</option>
-<option value="Neon">🔵 Neon</option>
-<option value="PagBank">🟡 PagBank</option>
-<option value="Will Bank">🟣 Will Bank</option>
-<option value="Next">🟢 Next</option>
-<option value="BTG Pactual">⚫ BTG Pactual</option>
-<option value="Outro">📋 Outro...</option>
-</select></div>
-<div class="fg" id="bk-custom-wrap" style="display:none"><label>Nome personalizado</label><input type="text" id="bk-custom-name" placeholder="Ex: Cooperativa XYZ"></div>
-<div class="fg"><label>Tipo de Conta</label>
-<select id="bk-tipo" onchange="bkTipoChange()">
-<option value="corrente">💳 Conta Corrente</option>
-<option value="poupanca">🐖 Poupança</option>
-<option value="cartao">💳 Cartão de Crédito</option>
-<option value="investimento">📊 Investimento</option>
-
-</select></div>
-<div class="fr">
-<div class="fg"><label>Saldo Atual (R$)</label><input type="number" id="bk-saldo-input" placeholder="0,00" step="0.01"></div>
-<div class="fg" id="bk-limite-wrap"><label>Limite de Crédito (R$)</label><input type="number" id="bk-limite-input" placeholder="0,00" step="0.01" min="0"></div>
-</div>
-<div class="fg" id="bk-fatura-wrap" style="display:none"><label>Fatura Atual (R$)</label><input type="number" id="bk-fatura-input" placeholder="0,00" step="0.01" min="0"></div>
-<div class="fg"><label>Cor</label>
-<div class="cdots" id="bk-colors">
-<div class="cdot sel" style="background:#9b72ef" onclick="selBkCor(this,'#9b72ef')"></div>
-<div class="cdot" style="background:#ff6b35" onclick="selBkCor(this,'#ff6b35')"></div>
-<div class="cdot" style="background:#1a1a1a" onclick="selBkCor(this,'#1a1a1a')"></div>
-<div class="cdot" style="background:#00c853" onclick="selBkCor(this,'#00c853')"></div>
-<div class="cdot" style="background:#2196f3" onclick="selBkCor(this,'#2196f3')"></div>
-<div class="cdot" style="background:#e53935" onclick="selBkCor(this,'#e53935')"></div>
-<div class="cdot" style="background:#ffd600" onclick="selBkCor(this,'#ffd600')"></div>
-<div class="cdot" style="background:#4caf82" onclick="selBkCor(this,'#4caf82')"></div>
-</div></div>
-<div class="fg"><label>Observações</label><input type="text" id="bk-obs" placeholder="Conta principal, salário..."></div>
-<div class="mfooter"><button class="btn bghost" onclick="closeModal('mbank')">Cancelar</button><button class="btn bprim" onclick="saveBank()">Salvar</button></div>
-</div></div>
-
+<script src="https://cdn.pluggy.ai/pluggy-connect/v2.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -644,7 +608,7 @@ let CU=null,DVS=[],LMBs=[],HISTs=[],CFG={},FIL='todos',FQ={f:'nao',l:'nao'};
 let uDV,uLM,uHT,uCF,uFIN;
 let FDAT={},txFil='TODAS',txType='SAIDA',selCatCor_='#f5a623';
 let pieChart=null,mesFin=nowYM();
-let BANKS=[],uBK=null,selBkCor_='#9b72ef',creditChart=null;
+let BANKS=[],uBK=null,creditChart=null;
 
 const DEF_CATS=[{id:1,name:'Alimentação',color:'#e05a5a'},{id:2,name:'Transporte',color:'#4ecdc4'},{id:3,name:'Moradia',color:'#5b8def'},{id:4,name:'Saúde',color:'#4caf82'},{id:5,name:'Lazer',color:'#9b72ef'},{id:6,name:'Assinaturas',color:'#06d6a0'},{id:7,name:'Vendas',color:'#f5a623'},{id:8,name:'Outros',color:'#adb5bd'}];
 const DEF_ACCTS=[{id:1,name:'Carteira',icon:'👛',color:'#ff9f43',initialBalance:0},{id:2,name:'Nubank',icon:'💳',color:'#9b72ef',initialBalance:0},{id:3,name:'Inter',icon:'🏦',color:'#e05a5a',initialBalance:0}];
@@ -653,6 +617,13 @@ let FIN=blankFin();
 
 const BANK_ICONS={'Nubank':'💜','Inter':'🟠','C6 Bank':'⚫','PicPay':'🟢','Mercado Pago':'🔵','Itaú':'🟠','Bradesco':'🔴','Banco do Brasil':'🟡','Caixa':'🔵','Santander':'🔴','Sicoob':'🟢','Sicredi':'🟢','Neon':'🔵','PagBank':'🟡','Will Bank':'🟣','Next':'🟢','BTG Pactual':'⚫'};
 const TIPO_LABELS={'corrente':'Conta Corrente','poupanca':'Poupança','cartao':'Cartão de Crédito','investimento':'Investimento'};
+
+// ── PLUGGY OPEN FINANCE ──
+const PLUGGY_CLIENT_ID='1b97dc5b-ecfc-446d-8629-07ea2cd8dc1e';
+const PLUGGY_CLIENT_SECRET='91aac014-9a55-408d-8392-515c7afe5f0d';
+const PLUGGY_API='https://api.pluggy.ai';
+let pluggyApiKey=null;
+let PLUGGY_ITEMS=[];let uPI=null;
 
 // ── AUTH ──
 auth.onAuthStateChanged(u=>{if(u){CU=u;document.getElementById('ls').style.display='none';updateUI(u);startL();}else{CU=null;document.getElementById('ls').style.display='flex';stopL();setSd('load');}});
@@ -673,8 +644,9 @@ uHT=col('historico').orderBy('criadoEm','desc').limit(80).onSnapshot(s=>{HISTs=s
 uCF=db.collection('devedorapp').doc(CU.uid).onSnapshot(s=>{if(s.exists){CFG=s.data().config||{};loadCfg();}});
 uFIN=finRef().onSnapshot(s=>{FIN=s.exists?s.data():blankFin();renderFin();renderTx();renderCfgFin();});
 uBK=col('bancos').orderBy('criadoEm','desc').onSnapshot(s=>{BANKS=s.docs.map(d=>({id:d.id,...d.data()}));renderBanks();});
+uPI=col('pluggy_items').onSnapshot(s=>{PLUGGY_ITEMS=s.docs.map(d=>({id:d.id,...d.data()}));renderPluggyStatus();});
 }
-function stopL(){[uDV,uLM,uHT,uCF,uFIN,uBK].forEach(u=>u&&u());}
+function stopL(){[uDV,uLM,uHT,uCF,uFIN,uBK,uPI].forEach(u=>u&&u());}
 function setSd(s){const d=document.getElementById('sdot');d.className='sync-dot';d.classList.add(s==='ok'?'sok':s==='load'?'sload':'serr');}
 async function persistFin(){try{await finRef().set(FIN);}catch(e){toast('Erro financas: '+e.message);}}
 
@@ -709,12 +681,12 @@ if(tab==='bk')renderBanks();
 const fab=document.getElementById('fab'),fbtn=document.getElementById('fab-btn');
 if(tab==='tx'){fab.textContent='＋';fbtn.textContent='＋ Transação';fab.style.display='flex';fbtn.style.display='inline-flex';}
 else if(tab==='dv'){fab.textContent='＋';fbtn.textContent='＋ Novo';fab.style.display='flex';fbtn.style.display='inline-flex';}
-else if(tab==='bk'){fab.textContent='＋';fbtn.textContent='＋ Banco';fab.style.display='flex';fbtn.style.display='inline-flex';}
+else if(tab==='bk'){fab.textContent='🔗';fbtn.textContent='🔗 Conectar';fab.style.display='flex';fbtn.style.display='inline-flex';}
 else{fab.style.display='none';fbtn.style.display='none';}
 }
 function fabClick(){
 if(curTab==='tx'){txType='SAIDA';openModal('mtx');popTxForm();}
-else if(curTab==='bk'){resetBankForm();openModal('mbank');}
+else if(curTab==='bk'){connectBank();}
 else{openModal('madd');}
 }
 
@@ -945,6 +917,9 @@ const dvs=await col('devedores').get();const b1=db.batch();dvs.docs.forEach(d=>b
 // Limpar bancos
 const bks=await col('bancos').get();const b2=db.batch();bks.docs.forEach(d=>b2.delete(d.ref));await b2.commit();
 
+// Limpar itens Pluggy
+const pis=await col('pluggy_items').get();const b5=db.batch();pis.docs.forEach(d=>b5.delete(d.ref));await b5.commit();
+
 // Limpar lembretes
 const lms=await col('lembretes').get();const b3=db.batch();lms.docs.forEach(d=>b3.delete(d.ref));await b3.commit();
 
@@ -955,31 +930,87 @@ toast('🗑️ Todos os dados foram limpos');
 }
 
 // ══════════════════════════════════════════════════════════════
-// OPEN FINANCE — MEUS BANCOS
+// OPEN FINANCE — PLUGGY INTEGRATION
 // ══════════════════════════════════════════════════════════════
 
-function bkBancoChange(){document.getElementById('bk-custom-wrap').style.display=document.getElementById('bk-banco').value==='Outro'?'block':'none';}
-function bkTipoChange(){const tipo=document.getElementById('bk-tipo').value;const isCartao=tipo==='cartao';document.getElementById('bk-limite-wrap').style.display=(isCartao||tipo==='corrente')?'block':'none';document.getElementById('bk-fatura-wrap').style.display=isCartao?'block':'none';if(!isCartao)document.getElementById('bk-fatura-input').value='';}
-function selBkCor(el,cor){document.querySelectorAll('#bk-colors .cdot').forEach(d=>d.classList.remove('sel'));el.classList.add('sel');selBkCor_=cor;}
+const BANK_COLORS={'Nubank':'#9b72ef','Inter':'#ff6b35','C6 Bank':'#1a1a1a','PicPay':'#00c853','Mercado Pago':'#2196f3','Itaú':'#ff6b35','Bradesco':'#e53935','Banco do Brasil':'#ffd600','Caixa':'#2196f3','Santander':'#e53935','Sicoob':'#00c853','Sicredi':'#00c853','Neon':'#2196f3','PagBank':'#ffd600','Will Bank':'#9b72ef','Next':'#00c853','BTG Pactual':'#1a1a1a'};
 
-function resetBankForm(){document.getElementById('bk-id').value='';document.getElementById('bk-banco').value='';document.getElementById('bk-custom-name').value='';document.getElementById('bk-custom-wrap').style.display='none';document.getElementById('bk-tipo').value='corrente';document.getElementById('bk-saldo-input').value='';document.getElementById('bk-limite-input').value='';document.getElementById('bk-fatura-input').value='';document.getElementById('bk-obs').value='';document.getElementById('bk-limite-wrap').style.display='block';document.getElementById('bk-fatura-wrap').style.display='none';selBkCor_='#9b72ef';document.querySelectorAll('#bk-colors .cdot').forEach(d=>d.classList.remove('sel'));document.querySelector('#bk-colors .cdot').classList.add('sel');document.getElementById('mbank-title-text').textContent='Novo Banco';}
+async function pluggyAuth(){
+if(pluggyApiKey)return pluggyApiKey;
+try{const r=await fetch(PLUGGY_API+'/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId:PLUGGY_CLIENT_ID,clientSecret:PLUGGY_CLIENT_SECRET})});
+if(!r.ok)throw new Error('Auth falhou: '+r.status);
+const d=await r.json();pluggyApiKey=d.apiKey;setTimeout(()=>{pluggyApiKey=null;},7000000);return pluggyApiKey;
+}catch(e){toast('❌ Erro Pluggy Auth: '+e.message);throw e;}}
 
-async function saveBank(){const selBanco=document.getElementById('bk-banco').value;const customName=document.getElementById('bk-custom-name').value.trim();const nome=selBanco==='Outro'?customName:selBanco;if(!nome){toast('Selecione um banco!');return;}const tipo=document.getElementById('bk-tipo').value;const saldo=parseFloat(document.getElementById('bk-saldo-input').value)||0;const limite=parseFloat(document.getElementById('bk-limite-input').value)||0;const fatura=parseFloat(document.getElementById('bk-fatura-input').value)||0;const obs=document.getElementById('bk-obs').value.trim();const editId=document.getElementById('bk-id').value;const data={nome,tipo,saldo,limite,fatura,obs,cor:selBkCor_,icon:BANK_ICONS[nome]||'🏦',atualizadoEm:TS()};setSd('load');try{if(editId){await col('bancos').doc(editId).update(data);toast('✅ Banco atualizado!');}else{data.criadoEm=TS();await col('bancos').add(data);addH('add',`Banco ${nome} adicionado`);toast('✅ Banco salvo!');}closeModal('mbank');resetBankForm();}catch(e){toast('Erro: '+e.message);setSd('err');}}
+async function connectBank(){
+const btn=document.getElementById('btn-connect-bank');btn.disabled=true;btn.innerHTML='⏳ Conectando...';
+try{const apiKey=await pluggyAuth();
+const r=await fetch(PLUGGY_API+'/connect_token',{method:'POST',headers:{'Content-Type':'application/json','X-API-KEY':apiKey},body:JSON.stringify({})});
+if(!r.ok)throw new Error('ConnectToken falhou: '+r.status);
+const d=await r.json();
+const pluggyConnect=new PluggyConnect({connectToken:d.accessToken,
+onSuccess:async(data)=>{toast('🏦 Banco conectado! Sincronizando...');await handlePluggyItem(data.item);},
+onError:(err)=>{toast('❌ Erro: '+(err.message||err));},
+onClose:()=>{btn.disabled=false;btn.innerHTML='🔗 Conectar Banco';}});
+pluggyConnect.init();
+}catch(e){toast('❌ '+e.message);btn.disabled=false;btn.innerHTML='🔗 Conectar Banco';}}
 
-function editBank(id,e){if(e)e.stopPropagation();const b=BANKS.find(x=>x.id===id);if(!b)return;document.getElementById('bk-id').value=id;document.getElementById('mbank-title-text').textContent='Editar Banco';const sel=document.getElementById('bk-banco');const opt=[...sel.options].find(o=>o.value===b.nome);if(opt){sel.value=b.nome;document.getElementById('bk-custom-wrap').style.display='none';}else{sel.value='Outro';document.getElementById('bk-custom-wrap').style.display='block';document.getElementById('bk-custom-name').value=b.nome;}document.getElementById('bk-tipo').value=b.tipo||'corrente';document.getElementById('bk-saldo-input').value=b.saldo||0;document.getElementById('bk-limite-input').value=b.limite||0;document.getElementById('bk-fatura-input').value=b.fatura||0;document.getElementById('bk-obs').value=b.obs||'';bkTipoChange();selBkCor_=b.cor||'#9b72ef';document.querySelectorAll('#bk-colors .cdot').forEach(d=>{const bg=d.style.backgroundColor||d.style.background;d.classList.toggle('sel',rgbToHex(bg)===selBkCor_);});openModal('mbank');}
+async function handlePluggyItem(item){
+try{const apiKey=await pluggyAuth();
+const ir=await fetch(PLUGGY_API+'/items/'+item.id,{headers:{'X-API-KEY':apiKey}});const id_=await ir.json();
+const nome=id_.connector?.name||'Banco';
+await col('pluggy_items').doc(item.id).set({connectorId:id_.connector?.id||0,connectorName:nome,status:id_.status||'UPDATED',criadoEm:TS(),atualizadoEm:TS()},{merge:true});
+await fetchAndSaveAccounts(apiKey,item.id,nome);
+addH('add','Banco '+nome+' conectado via Open Finance');toast('✅ '+nome+' sincronizado!');
+}catch(e){toast('❌ Erro ao sincronizar: '+e.message);}}
 
-function rgbToHex(rgb){if(!rgb||rgb.startsWith('#'))return rgb;const p=rgb.match(/\d+/g);if(!p)return rgb;return'#'+p.slice(0,3).map(x=>parseInt(x).toString(16).padStart(2,'0')).join('');}
+async function fetchAndSaveAccounts(apiKey,itemId,connectorName){
+const r=await fetch(PLUGGY_API+'/accounts?itemId='+itemId,{headers:{'X-API-KEY':apiKey}});
+if(!r.ok)throw new Error('Erro contas: '+r.status);const data=await r.json();const accs=data.results||[];
+for(const acc of accs){
+const docId='pluggy_'+acc.id;const isCredit=acc.type==='CREDIT'||acc.subtype==='CREDIT_CARD';
+const tipoMap={'CHECKING_ACCOUNT':'corrente','SAVINGS_ACCOUNT':'poupanca','CREDIT_CARD':'cartao'};
+const tipo=tipoMap[acc.subtype]||(isCredit?'cartao':'corrente');
+const saldo=isCredit?0:(acc.balance||0);
+const limite=isCredit?(acc.creditData?.creditLimit||0):(tipo==='corrente'?(acc.creditData?.creditLimit||0):0);
+const faturaUsada=isCredit?(limite-(acc.creditData?.availableCreditLimit||0)):0;
+await col('bancos').doc(docId).set({nome:connectorName+(accs.length>1?' — '+(acc.name||tipo):''),tipo,saldo,limite,fatura:faturaUsada>0?faturaUsada:0,
+obs:acc.number?'Conta: ****'+acc.number.slice(-4):'',cor:BANK_COLORS[connectorName]||'#5b8def',icon:BANK_ICONS[connectorName]||'🏦',
+pluggyItemId:itemId,pluggyAccountId:acc.id,pluggySubtype:acc.subtype||'',atualizadoEm:TS(),criadoEm:TS()},{merge:true});}}
 
-async function delBank(id,e){if(e)e.stopPropagation();const b=BANKS.find(x=>x.id===id);if(!b||!confirm(`Remover "${b.nome}"?`))return;try{await col('bancos').doc(id).delete();addH('pay',`Banco ${b.nome} removido`);toast('Banco removido');}catch(e){toast('Erro: '+e.message);}}
+async function pluggySyncAll(){
+const btn=document.getElementById('btn-sync-banks');if(!PLUGGY_ITEMS.length){toast('Nenhum banco conectado.');return;}
+btn.disabled=true;btn.innerHTML='⏳ Sincronizando...';
+const info=document.getElementById('pluggy-sync-info');info.style.display='block';info.textContent='Sincronizando via Open Finance...';
+try{const apiKey=await pluggyAuth();let ok=0,errs=0;
+for(const item of PLUGGY_ITEMS){try{
+const ir=await fetch(PLUGGY_API+'/items/'+item.id,{headers:{'X-API-KEY':apiKey}});if(!ir.ok){errs++;continue;}
+const id_=await ir.json();await col('pluggy_items').doc(item.id).update({status:id_.status,atualizadoEm:TS()});
+await fetchAndSaveAccounts(apiKey,item.id,item.connectorName||id_.connector?.name||'Banco');ok++;
+}catch(e){errs++;}}
+const agora=new Date().toLocaleString('pt-BR');
+info.innerHTML='✅ Sincronizado '+agora+' — '+ok+' banco'+(ok!==1?'s':'')+' atualizado'+(ok!==1?'s':'')+(errs?' · '+errs+' erro(s)':'');
+addH('msg','Open Finance sincronizado — '+ok+' banco(s)');toast('✅ Bancos sincronizados!');
+}catch(e){info.innerHTML='❌ Erro: '+e.message;toast('❌ Erro na sincronização');
+}finally{btn.disabled=false;btn.innerHTML='🔄 Sincronizar';}}
 
-async function quickUpdateBank(id,field,e){if(e)e.stopPropagation();const b=BANKS.find(x=>x.id===id);if(!b)return;const labels={saldo:'Saldo',limite:'Limite',fatura:'Fatura'};const atual=b[field]||0;const novo=prompt(`${labels[field]} atual: ${R$(atual)}\n\nNovo valor:`,atual);if(novo===null)return;const val=parseFloat(novo);if(isNaN(val)){toast('Valor inválido!');return;}try{await col('bancos').doc(id).update({[field]:val,atualizadoEm:TS()});toast(`✅ ${labels[field]} atualizado!`);}catch(err){toast('Erro: '+err.message);}}
+async function disconnectBank(itemId,e){if(e)e.stopPropagation();
+const item=PLUGGY_ITEMS.find(i=>i.id===itemId);const nome=item?.connectorName||'banco';
+if(!confirm('Desconectar "'+nome+'" do Open Finance?\n\nAs contas vinculadas serão removidas.'))return;
+try{const toRemove=BANKS.filter(b=>b.pluggyItemId===itemId);for(const b of toRemove)await col('bancos').doc(b.id).delete();
+try{const apiKey=await pluggyAuth();await fetch(PLUGGY_API+'/items/'+itemId,{method:'DELETE',headers:{'X-API-KEY':apiKey}});}catch(e){}
+await col('pluggy_items').doc(itemId).delete();addH('pay','Banco '+nome+' desconectado');toast('🗑️ '+nome+' desconectado');
+}catch(e){toast('Erro: '+e.message);}}
+
+function renderPluggyStatus(){const el=document.getElementById('pluggy-status');
+if(PLUGGY_ITEMS.length){el.style.display='inline-flex';el.textContent='● '+PLUGGY_ITEMS.length+' banco'+(PLUGGY_ITEMS.length>1?'s':'')+' conectado'+(PLUGGY_ITEMS.length>1?'s':'');}
+else el.style.display='none';}
 
 function renderBanks(){
 const totalSaldo=BANKS.reduce((s,b)=>s+(b.saldo||0),0);
 const totalLimite=BANKS.filter(b=>b.limite>0).reduce((s,b)=>s+(b.limite||0),0);
 const totalFatura=BANKS.filter(b=>b.tipo==='cartao').reduce((s,b)=>s+(b.fatura||0),0);
-const creditoDisp=totalLimite-totalFatura;
-const patrimonio=totalSaldo+creditoDisp;
+const creditoDisp=totalLimite-totalFatura;const patrimonio=totalSaldo+creditoDisp;
 const elPat=document.getElementById('bk-patrimonio');if(elPat){elPat.textContent=R$(patrimonio);elPat.style.color=patrimonio>=0?'var(--gn)':'var(--rd)';}
 const elS=document.getElementById('bk-saldo');if(elS){elS.textContent=R$(totalSaldo);elS.style.color=totalSaldo>=0?'var(--gn)':'var(--rd)';}
 const elL=document.getElementById('bk-limite');if(elL)elL.textContent=R$(totalLimite);
@@ -987,9 +1018,16 @@ const elC=document.getElementById('bk-creddisp');if(elC)elC.textContent=R$(credi
 const elF=document.getElementById('bk-fatura');if(elF)elF.textContent=R$(totalFatura);
 renderCreditChart();
 const el=document.getElementById('lbanks');if(!el)return;
-if(!BANKS.length){el.innerHTML='<div class="empty"><div class="empty-icon">🏦</div><p>Nenhum banco cadastrado.<br>Toque em ＋ Banco para começar.</p></div>';return;}
-el.innerHTML=BANKS.map(b=>{const hasLimite=b.limite>0;const isCartao=b.tipo==='cartao';const utilizacao=hasLimite?((b.fatura||0)/b.limite*100):0;const barClass=utilizacao<40?'low':utilizacao<75?'mid':'high';const tipoLabel=TIPO_LABELS[b.tipo]||b.tipo;const icon=b.icon||BANK_ICONS[b.nome]||'🏦';const cor=b.cor||'#9b72ef';const lastUpdate=b.atualizadoEm?.toDate?b.atualizadoEm.toDate().toLocaleDateString('pt-BR'):'';
-return`<div class="bank-card" onclick="togC('bc-${b.id}')"><div class="bank-card-top"><div class="bank-logo" style="background:${cor}22;border:1px solid ${cor}44"><span style="font-size:1.4rem">${icon}</span></div><div style="flex:1"><div class="bank-name">${b.nome}</div><div class="bank-type">${tipoLabel}${lastUpdate?' · Atualizado: '+lastUpdate:''}</div></div><div style="text-align:right"><div style="font-family:'DM Mono',monospace;font-size:1rem;font-weight:700;color:${(b.saldo||0)>=0?'var(--gn)':'var(--rd)'}">${R$(b.saldo||0)}</div><div style="font-size:.65rem;color:var(--t3)">saldo</div></div></div><div class="bank-balances">${hasLimite?`<div class="bank-bal-item"><div class="bank-bal-label">Limite</div><div class="bank-bal-val" style="color:var(--bl)">${R$(b.limite)}</div></div>`:''}${isCartao?`<div class="bank-bal-item"><div class="bank-bal-label">Fatura Aberta</div><div class="bank-bal-val" style="color:var(--rd)">${R$(b.fatura||0)}</div></div>`:''}${hasLimite&&!isCartao?`<div class="bank-bal-item"><div class="bank-bal-label">Disponível</div><div class="bank-bal-val" style="color:var(--pu)">${R$((b.limite||0)-(b.fatura||0))}</div></div>`:''}${!hasLimite&&!isCartao?`<div class="bank-bal-item"><div class="bank-bal-label">Tipo</div><div class="bank-bal-val" style="color:var(--t2)">${tipoLabel}</div></div>`:''}</div>${isCartao&&hasLimite?`<div class="credit-bar-wrap"><div class="credit-bar-header"><span class="credit-bar-label">Utilização do limite</span><span class="credit-bar-pct" style="color:${utilizacao<40?'var(--gn)':utilizacao<75?'var(--am)':'var(--rd)'}">${utilizacao.toFixed(0)}%</span></div><div class="credit-bar"><div class="credit-bar-fill ${barClass}" style="width:${Math.min(utilizacao,100)}%"></div></div></div>`:''}${b.obs?`<div style="font-size:.72rem;color:var(--t3);margin-top:6px;padding:4px 0">📝 ${b.obs}</div>`:''}<div class="bank-actions" id="bc-${b.id}" style="display:none"><button class="bsm" onclick="quickUpdateBank('${b.id}','saldo',event)">💰 Saldo</button>${hasLimite?`<button class="bsm" onclick="quickUpdateBank('${b.id}','limite',event)">📊 Limite</button>`:''}${isCartao?`<button class="bsm" onclick="quickUpdateBank('${b.id}','fatura',event)">📄 Fatura</button>`:''}<button class="bsm pu" onclick="editBank('${b.id}',event)">✏️ Editar</button><button class="bsm danger" onclick="delBank('${b.id}',event)">🗑️</button></div></div>`;}).join('');}
+if(!BANKS.length){el.innerHTML='<div class="empty"><div class="empty-icon">🔗</div><p>Nenhum banco conectado.<br>Toque em <strong>Conectar Banco</strong> para vincular via Open Finance.</p></div>';return;}
+const items={};BANKS.forEach(b=>{const key=b.pluggyItemId||'manual';if(!items[key])items[key]=[];items[key].push(b);});
+let html='';for(const[itemId,banks] of Object.entries(items)){
+const isPluggy=itemId!=='manual';const item=isPluggy?PLUGGY_ITEMS.find(i=>i.id===itemId):null;
+if(isPluggy){const sc=item?.status==='UPDATED'?'connected':item?.status==='UPDATING'?'syncing':'error';const sl=item?.status==='UPDATED'?'Atualizado':item?.status==='UPDATING'?'Atualizando...':'Verificar';
+html+='<div style="display:flex;align-items:center;justify-content:space-between;margin:12px 0 6px;padding:0 2px"><div style="display:flex;align-items:center;gap:6px"><span style="font-size:.82rem;font-weight:600;color:var(--t1)">'+(item?.connectorName||'Banco')+'</span><span class="pluggy-badge '+sc+'">'+sl+'</span></div><button class="bsm danger" style="font-size:.65rem" onclick="disconnectBank(\''+itemId+'\',event)">✕ Desconectar</button></div>';}
+for(const b of banks){
+const hasLimite=b.limite>0;const isCartao=b.tipo==='cartao';const utilizacao=hasLimite?((b.fatura||0)/b.limite*100):0;const barClass=utilizacao<40?'low':utilizacao<75?'mid':'high';const tipoLabel=TIPO_LABELS[b.tipo]||b.tipo;const icon=b.icon||BANK_ICONS[b.nome]||'🏦';const cor=b.cor||'#5b8def';const lastUpdate=b.atualizadoEm?.toDate?b.atualizadoEm.toDate().toLocaleString('pt-BR'):'';
+html+=`<div class="bank-card"><div class="bank-card-top"><div class="bank-logo" style="background:${cor}22;border:1px solid ${cor}44"><span style="font-size:1.4rem">${icon}</span></div><div style="flex:1"><div class="bank-name">${b.nome}</div><div class="bank-type">${tipoLabel}${lastUpdate?' · '+lastUpdate:''}</div>${b.obs?`<div class="bank-pluggy-info">🔗 ${b.obs}</div>`:''}</div><div style="text-align:right"><div style="font-family:'DM Mono',monospace;font-size:1rem;font-weight:700;color:${(b.saldo||0)>=0?'var(--gn)':'var(--rd)'}">${R$(b.saldo||0)}</div><div style="font-size:.65rem;color:var(--t3)">saldo</div></div></div><div class="bank-balances">${hasLimite?`<div class="bank-bal-item"><div class="bank-bal-label">Limite</div><div class="bank-bal-val" style="color:var(--bl)">${R$(b.limite)}</div></div>`:''}${isCartao?`<div class="bank-bal-item"><div class="bank-bal-label">Fatura Aberta</div><div class="bank-bal-val" style="color:var(--rd)">${R$(b.fatura||0)}</div></div>`:''}${hasLimite&&!isCartao?`<div class="bank-bal-item"><div class="bank-bal-label">Disponível</div><div class="bank-bal-val" style="color:var(--pu)">${R$((b.limite||0)-(b.fatura||0))}</div></div>`:''}${!hasLimite&&!isCartao?`<div class="bank-bal-item"><div class="bank-bal-label">Tipo</div><div class="bank-bal-val" style="color:var(--t2)">${tipoLabel}</div></div>`:''}</div>${isCartao&&hasLimite?`<div class="credit-bar-wrap"><div class="credit-bar-header"><span class="credit-bar-label">Utilização do limite</span><span class="credit-bar-pct" style="color:${utilizacao<40?'var(--gn)':utilizacao<75?'var(--am)':'var(--rd)'}">${utilizacao.toFixed(0)}%</span></div><div class="credit-bar"><div class="credit-bar-fill ${barClass}" style="width:${Math.min(utilizacao,100)}%"></div></div></div>`:''}</div>`;}}
+el.innerHTML=html;}
 
 function renderCreditChart(){const canvas=document.getElementById('chart-credit');if(!canvas)return;const cartoes=BANKS.filter(b=>b.tipo==='cartao'&&b.limite>0);const chartBox=document.getElementById('bk-chart-box');if(!cartoes.length){if(chartBox)chartBox.style.display='none';return;}if(chartBox)chartBox.style.display='block';if(creditChart)creditChart.destroy();const labels=cartoes.map(b=>b.nome);const usado=cartoes.map(b=>b.fatura||0);const disponivel=cartoes.map(b=>(b.limite||0)-(b.fatura||0));creditChart=new Chart(canvas,{type:'bar',data:{labels,datasets:[{label:'Usado',data:usado,backgroundColor:'rgba(224,90,90,.7)',borderRadius:4},{label:'Disponível',data:disponivel,backgroundColor:'rgba(76,175,130,.7)',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',scales:{x:{stacked:true,ticks:{color:'#7a8499',callback:v=>'R$'+v},grid:{color:'#1f2530'}},y:{stacked:true,ticks:{color:'#e8eaf0',font:{size:11}},grid:{display:false}}},plugins:{legend:{position:'bottom',labels:{color:'#7a8499',font:{size:11},boxWidth:10}},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: R$ ${ctx.raw.toFixed(2)}`}}}}});}
 
