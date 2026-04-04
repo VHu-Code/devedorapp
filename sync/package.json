@@ -1,0 +1,13 @@
+{
+  "name": "devedorapp-pluggy-sync",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sincroniza dados do Open Finance (Pluggy) no Firestore",
+  "scripts": {
+    "sync": "node pluggy-sync.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.0.0",
+    "node-fetch": "^3.3.2"
+  }
+}
